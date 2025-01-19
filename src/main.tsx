@@ -4,6 +4,9 @@ import { Provider } from "react-redux"
 import App from "./App"
 import { store } from "./app/store"
 import "./index.css"
+import { MantineProvider } from "@mantine/core"
+import { BrowserRouter } from "react-router-dom"
+import "@mantine/core/styles.css"
 
 const container = document.getElementById("root")
 
@@ -13,7 +16,11 @@ if (container) {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <App />
+        <MantineProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </MantineProvider>
       </Provider>
     </React.StrictMode>,
   )
