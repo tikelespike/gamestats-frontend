@@ -16,7 +16,7 @@ if (container) {
   root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <MantineProvider>
+        <MantineProvider defaultColorScheme="dark">
           <BrowserRouter>
             <App />
           </BrowserRouter>
