@@ -1,29 +1,25 @@
 import { useState } from "react"
 import {
-  Icon2fa,
-  IconBellRinging,
-  IconDatabaseImport,
-  IconFingerprint,
-  IconKey,
+  IconCircles,
+  IconDeviceGamepad,
   IconLogout,
-  IconReceipt2,
-  IconSettings,
+  IconScript,
   IconSwitchHorizontal,
+  IconUsers,
+  IconUserSquareRounded,
 } from "@tabler/icons-react"
 import classes from "./NavBar.module.css"
 
 const data = [
-  { link: "", label: "Notifications", icon: IconBellRinging },
-  { link: "", label: "Billing", icon: IconReceipt2 },
-  { link: "", label: "Security", icon: IconFingerprint },
-  { link: "", label: "SSH Keys", icon: IconKey },
-  { link: "", label: "Databases", icon: IconDatabaseImport },
-  { link: "", label: "Authentication", icon: Icon2fa },
-  { link: "", label: "Other Settings", icon: IconSettings },
+  { link: "", label: "Games", icon: IconDeviceGamepad },
+  { link: "", label: "Scripts", icon: IconScript },
+  { link: "", label: "Characters", icon: IconCircles },
+  { link: "", label: "Users", icon: IconUserSquareRounded },
+  { link: "", label: "Players", icon: IconUsers },
 ]
 
 export function NavBar() {
-  const [active, setActive] = useState("Billing")
+  const [active, setActive] = useState("Games")
 
   const links = data.map(item => (
     <a
