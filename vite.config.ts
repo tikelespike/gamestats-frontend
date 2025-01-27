@@ -7,6 +7,13 @@ export default defineConfig({
   server: {
     open: true,
   },
+  resolve: {
+    alias: {
+      // Workaround for tabler icons performance issue
+      // /esm/icons/index.mjs only exports the icons statically, so no separate chunks are created
+      "@tabler/icons-react": "@tabler/icons-react/dist/esm/icons/index.mjs",
+    },
+  },
   test: {
     globals: true,
     environment: "jsdom",
