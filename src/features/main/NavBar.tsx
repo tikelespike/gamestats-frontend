@@ -1,4 +1,3 @@
-import { useState } from "react"
 import {
   IconCircles,
   IconDeviceGamepad,
@@ -9,27 +8,30 @@ import {
   IconUserSquareRounded,
 } from "@tabler/icons-react"
 import classes from "./NavBar.module.css"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const data = [
-  { link: "", label: "Games", icon: IconDeviceGamepad },
-  { link: "", label: "Scripts", icon: IconScript },
-  { link: "", label: "Characters", icon: IconCircles },
-  { link: "", label: "Users", icon: IconUserSquareRounded },
-  { link: "", label: "Players", icon: IconUsers },
+  { link: "/manager/games", label: "Games", icon: IconDeviceGamepad },
+  { link: "/manager/scripts", label: "Scripts", icon: IconScript },
+  { link: "/manager/characters", label: "Characters", icon: IconCircles },
+  { link: "/manager/players", label: "Players", icon: IconUsers },
+  { link: "/manager/users", label: "Users", icon: IconUserSquareRounded },
 ]
 
 export function NavBar() {
-  const [active, setActive] = useState("Games")
+  const location = useLocation()
+  const active = location.pathname
+  const navigate = useNavigate()
 
   const links = data.map(item => (
     <a
       className={classes.link}
-      data-active={item.label === active || undefined}
+      data-active={item.link === active || undefined}
       href={item.link}
       key={item.label}
       onClick={event => {
         event.preventDefault()
-        setActive(item.label)
+        navigate(item.link)
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />

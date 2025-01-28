@@ -6,6 +6,7 @@ import { PrivateOutlet } from "./utils/PrivateOutlet"
 import MainLayout from "./features/main/MainLayout"
 import GameManager from "./features/games/GameManager"
 import { PublicOutlet } from "./utils/PublicOutlet"
+import CharacterManager from "./features/characters/CharacterManager"
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route element={<PrivateOutlet />}>
           <Route element={<MainLayout />}>
             <Route path="/manager/games" element={<GameManager />} />
+            <Route path="/manager/characters" element={<CharacterManager />} />
           </Route>
         </Route>
       </Routes>
