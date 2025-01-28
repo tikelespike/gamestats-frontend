@@ -1,9 +1,10 @@
-import React from "react"
+import type React from "react"
 import { useDisclosure } from "@mantine/hooks"
 import { AppShell, Burger, Group, Text } from "@mantine/core"
 import { NavBar } from "./NavBar"
+import { Outlet } from "react-router-dom"
 
-const MainLayout = () => {
+const MainLayout: React.FC = () => {
   const [opened, { toggle }] = useDisclosure()
 
   return (
@@ -21,7 +22,9 @@ const MainLayout = () => {
       <AppShell.Navbar p="md">
         <NavBar />
       </AppShell.Navbar>
-      <AppShell.Main>Main</AppShell.Main>
+      <AppShell.Main>
+        <Outlet />
+      </AppShell.Main>
     </AppShell>
   )
 }
