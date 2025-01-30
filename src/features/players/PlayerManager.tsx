@@ -1,5 +1,5 @@
 import { IconPencil, IconTrash } from "@tabler/icons-react"
-import { ActionIcon, Group, Table, Text } from "@mantine/core"
+import { ActionIcon, Button, Group, Table, Text } from "@mantine/core"
 
 const data = [
   {
@@ -90,7 +90,8 @@ export default function PlayerManager() {
 
   return (
     <Table.ScrollContainer minWidth={800}>
-      <Table verticalSpacing="sm">
+      <Button size={"md"}>Add Player</Button>
+      <Table verticalSpacing="md">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
