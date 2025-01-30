@@ -56,7 +56,7 @@ export default function PlayerManager() {
   ))
 
   return (
-    <Table.ScrollContainer minWidth={800}>
+    <Table.ScrollContainer minWidth={400}>
       <Button size={"md"}>Add Player</Button>
       <Table verticalSpacing="md">
         <Table.Thead>
