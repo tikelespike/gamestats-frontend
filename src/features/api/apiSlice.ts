@@ -1,5 +1,5 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { RootState } from '../../app/store'
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import type { RootState } from "../../app/store"
 
 export interface UserResponse {
   accessToken: string
@@ -10,6 +10,12 @@ export interface LoginRequest {
   password: string
 }
 
+export interface Player {
+  id: string
+  name: string
+  ownerId: bigint
+}
+
 export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL as string,
@@ -17,20 +23,23 @@ export const apiSlice = createApi({
       // By default, if we have a token in the store, let's use that for authenticated requests
       const token = (getState() as RootState).auth.token
       if (token) {
-        headers.set('authorization', `Bearer ${token}`)
+        headers.set("authorization", `Bearer ${token}`)
       }
       return headers
     },
   }),
-  endpoints: (builder) => ({
+  endpoints: builder => ({
     login: builder.mutation<UserResponse, LoginRequest>({
-      query: (credentials) => ({
-        url: '/auth/signin',
-        method: 'POST',
+      query: credentials => ({
+        url: "/auth/signin",
+        method: "POST",
         body: credentials,
       }),
+    }),
+    players: builder.query<Player[], void>({
+      query: () => "/players",
     }),
   }),
 })
 
-export const { useLoginMutation } = apiSlice
+export const { useLoginMutation, usePlayersQuery } = apiSlice

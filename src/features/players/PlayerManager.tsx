@@ -1,78 +1,45 @@
 import { IconPencil, IconTrash } from "@tabler/icons-react"
-import { ActionIcon, Button, Group, Table, Text } from "@mantine/core"
-
-const data = [
-  {
-    name: "Robert Wolfkisser",
-    associatedAccount: "rob_wolf@gmail.com",
-  },
-  {
-    name: "John Doe",
-    associatedAccount: "johndoe@outlook.com",
-  },
-  {
-    name: "Jane Doe",
-    associatedAccount: "janedoe@outlook.com",
-  },
-  {
-    name: "John Smith",
-    associatedAccount: "john@smith.co.uk",
-  },
-  {
-    name: "Greg Egan",
-    associatedAccount: null,
-  },
-  {
-    name: "John Doe",
-    associatedAccount: "johndoe@outlook.com",
-  },
-  {
-    name: "Jane Doe",
-    associatedAccount: "janedoe@outlook.com",
-  },
-  {
-    name: "John Smith",
-    associatedAccount: "john@smith.co.uk",
-  },
-  {
-    name: "Robert Wolfkisser",
-    associatedAccount: "rob_wolf@gmail.com",
-  },
-  {
-    name: "John Doe",
-    associatedAccount: "johndoe@outlook.com",
-  },
-  {
-    name: "Jane Doe",
-    associatedAccount: "janedoe@outlook.com",
-  },
-  {
-    name: "John Smith",
-    associatedAccount: "john@smith.co.uk",
-  },
-]
-
-const jobColors: Record<string, string> = {
-  engineer: "blue",
-  manager: "cyan",
-  designer: "pink",
-}
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Notification,
+  Table,
+  Text,
+} from "@mantine/core"
+import { usePlayersQuery } from "../api/apiSlice"
+import React from "react"
 
 export default function PlayerManager() {
-  const rows = data.map(item => (
-    <Table.Tr key={item.name}>
+  const { isError, error, data, isLoading } = usePlayersQuery()
+
+  if (isLoading) {
+    return <Text>Loading...</Text>
+  }
+  if (isError || data === undefined) {
+    return (
+      <Notification color="red" mt="md">
+        {error && "data" in error && (error.data as { detail: string }).detail
+          ? "Error: " + (error.data as { detail: string }).detail
+          : "Failed to fetch players"}
+      </Notification>
+    )
+  }
+
+  const rows = data.map(player => (
+    <Table.Tr key={player.id}>
       <Table.Td>
         <Group gap="sm">
           {/*Re-enable once profile pictures are implemented in backend*/}
           {/*<Avatar size={30} src={item.avatar} radius={30} />*/}
           <Text fz="sm" fw={500}>
-            {item.name}
+            {player.name}
           </Text>
         </Group>
       </Table.Td>
 
       <Table.Td>
-        <Text fz="sm">{item.associatedAccount}</Text>
+        <Text fz="sm">{player.ownerId ? player.ownerId.toString() : "-"}</Text>
       </Table.Td>
 
       <Table.Td>
