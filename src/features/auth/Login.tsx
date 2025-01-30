@@ -5,13 +5,20 @@ import type { LoginRequest } from "../api/apiSlice"
 import { useLoginMutation } from "../api/apiSlice"
 import { useForm } from "@mantine/form"
 import {
-  Box,
+  Anchor,
   Button,
+  Checkbox,
+  Container,
+  Group,
   Notification,
+  Paper,
   PasswordInput,
+  Text,
   TextInput,
+  Title,
 } from "@mantine/core"
 import { setToken } from "./authSlice"
+import classes from "./Login.module.css"
 
 export const Login = () => {
   const dispatch = useAppDispatch()
@@ -43,34 +50,50 @@ export const Login = () => {
   }
 
   return (
-    <Box maw={400} mx="auto">
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <TextInput
-          label="Username"
-          placeholder="Your username"
-          {...form.getInputProps("email")}
-        />
-        <PasswordInput
-          label="Password"
-          placeholder="Your password"
-          {...form.getInputProps("password")}
-          mt="md"
-        />
-        <Button type="submit" fullWidth mt="xl" loading={isLoading}>
-          Login
-        </Button>
-      </form>
+    <Container size={420} my={40}>
+      <Title ta="center" className={classes.title}>
+        Welcome back!
+      </Title>
+      <Text c="dimmed" size="sm" ta="center" mt={5}>
+        Do not have an account yet? Contact me to get one.
+      </Text>
 
-      {isError && (
-        <Notification color="red" mt="md">
-          {error &&
-          "data" in error &&
-          (error.data as { message: string }).message
-            ? (error.data as { message: string }).message
-            : "Login failed"}
-        </Notification>
-      )}
-    </Box>
+      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+        {isError && (
+          <Notification color="red" mb="md">
+            {error &&
+            "data" in error &&
+            (error.data as { message: string }).message
+              ? (error.data as { message: string }).message
+              : "Login failed"}
+          </Notification>
+        )}
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <TextInput
+            label="Email"
+            placeholder="you@mantine.dev"
+            required
+            {...form.getInputProps("email")}
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Your password"
+            required
+            mt="md"
+            {...form.getInputProps("password")}
+          />
+          <Group justify="space-between" mt="lg">
+            <Checkbox label="Remember me" />
+            <Anchor component="button" size="sm">
+              Forgot password?
+            </Anchor>
+          </Group>
+          <Button fullWidth mt="xl" loading={isLoading} type="submit">
+            Sign in
+          </Button>
+        </form>
+      </Paper>
+    </Container>
   )
 }
 

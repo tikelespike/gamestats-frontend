@@ -3,7 +3,6 @@ import {
   IconDeviceGamepad,
   IconLogout,
   IconScript,
-  IconSwitchHorizontal,
   IconUsers,
   IconUserSquareRounded,
 } from "@tabler/icons-react"
@@ -44,15 +43,6 @@ export function NavBar() {
       <div className={classes.navbarMain}>{links}</div>
 
       <div className={classes.footer}>
-        <a
-          href="#"
-          className={classes.link}
-          onClick={event => event.preventDefault()}
-        >
-          <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-          <span>Change account</span>
-        </a>
-
         <a
           href="#"
           className={classes.link}
