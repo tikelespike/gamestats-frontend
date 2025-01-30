@@ -10,8 +10,25 @@ import CharacterManager from "./features/characters/CharacterManager"
 import PlayerManager from "./features/players/PlayerManager"
 import NavigateToDefault from "./utils/NavigateToDefault"
 import { NotFound } from "./features/notfound/NotFound"
+import { useEffect } from "react"
+import { setToken } from "./features/auth/authSlice"
+import { jwtDecode } from "jwt-decode"
+import { useAppDispatch } from "./app/hooks"
 
 const App = () => {
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token")
+    if (token) {
+      const decoded: { exp: number } = jwtDecode(token)
+      const isExpired: boolean = decoded.exp * 1000 < Date.now()
+
+      if (!isExpired) dispatch(setToken({ token }))
+    }
+  }, [dispatch])
+
   return (
     <Box>
       <Routes>

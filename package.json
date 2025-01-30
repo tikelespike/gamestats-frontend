@@ -20,6 +20,7 @@
     "@mantine/hooks": "^7.15.3",
     "@reduxjs/toolkit": "^2.0.1",
     "@tabler/icons-react": "^3.29.0",
+    "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0",

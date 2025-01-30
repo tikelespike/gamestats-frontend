@@ -20,16 +20,23 @@ import {
 import { setToken } from "./authSlice"
 import classes from "./Login.module.css"
 
+interface LoginFormData {
+  email: string
+  password: string
+  rememberMe: boolean
+}
+
 export const Login = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
   const [login, { isLoading, isError, error }] = useLoginMutation()
 
-  const form = useForm<LoginRequest>({
+  const form = useForm<LoginFormData>({
     initialValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
     validate: {
       email: value =>
@@ -39,9 +46,21 @@ export const Login = () => {
     },
   })
 
-  const handleSubmit = async (values: LoginRequest) => {
+  const handleSubmit = async (values: LoginFormData) => {
     try {
-      const response = await login(values).unwrap()
+      const loginRequest: LoginRequest = {
+        email: values.email,
+        password: values.password,
+      }
+      const response = await login(loginRequest).unwrap()
+      // Store the token - I am aware that this is comes with security risks (XSS),
+      // but for this small and uncritical project it is acceptable. I might implement
+      // using secure cookies in the future.
+      if (values.rememberMe) {
+        localStorage.setItem("token", response.accessToken)
+      } else {
+        sessionStorage.setItem("token", response.accessToken)
+      }
       dispatch(setToken({ token: response.accessToken }))
       navigate("/manager/games")
     } catch (err) {
