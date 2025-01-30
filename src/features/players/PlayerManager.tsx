@@ -6,27 +6,50 @@ import {
   Notification,
   Table,
   Text,
+  TextInput,
 } from "@mantine/core"
-import { usePlayersQuery } from "../api/apiSlice"
-import React from "react"
+import type { AddPlayerRequest } from "../api/apiSlice"
+import { useAddPlayerMutation, usePlayersQuery } from "../api/apiSlice"
+import type React from "react"
+import { useForm } from "@mantine/form"
+import classes from "./PlayerManager.module.css"
 
 export default function PlayerManager() {
-  const { isError, error, data, isLoading } = usePlayersQuery()
+  const getPlayersState = usePlayersQuery()
+  const [addPlayer, addPlayerState] = useAddPlayerMutation()
 
-  if (isLoading) {
+  const newPlayerForm = useForm<AddPlayerRequest>({
+    initialValues: {
+      name: "",
+      ownerId: null,
+    },
+    validate: {
+      name: value =>
+        value && value.trim().length > 0 ? null : "Player name is required",
+    },
+  })
+
+  if (getPlayersState.isLoading) {
     return <Text>Loading...</Text>
   }
-  if (isError || data === undefined) {
+  if (getPlayersState.isError || getPlayersState.data === undefined) {
     return (
       <Notification color="red" mt="md">
-        {error && "data" in error && (error.data as { detail: string }).detail
-          ? "Error: " + (error.data as { detail: string }).detail
+        {getPlayersState.error &&
+        "data" in getPlayersState.error &&
+        (
+          getPlayersState.error.data as {
+            detail: string
+          }
+        ).detail
+          ? "Error: " +
+            (getPlayersState.error.data as { detail: string }).detail
           : "Failed to fetch players"}
       </Notification>
     )
   }
 
-  const rows = data.map(player => (
+  const rows = getPlayersState.data.map(player => (
     <Table.Tr key={player.id}>
       <Table.Td>
         <Group gap="sm">
@@ -57,7 +80,22 @@ export default function PlayerManager() {
 
   return (
     <Table.ScrollContainer minWidth={400}>
-      <Button size={"md"}>Add Player</Button>
+      <form onSubmit={newPlayerForm.onSubmit(addPlayer)}>
+        <Group align="flex-end" mb="sm">
+          <TextInput
+            label="New player name"
+            placeholder="Enter player name"
+            {...newPlayerForm.getInputProps("name")}
+          />
+          <Button
+            loading={addPlayerState.isLoading}
+            loaderProps={{ type: "dots" }}
+            type={"submit"}
+          >
+            Add Player
+          </Button>
+        </Group>
+      </form>
       <Table verticalSpacing="md">
         <Table.Thead>
           <Table.Tr>
@@ -66,7 +104,15 @@ export default function PlayerManager() {
             <Table.Th />
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        <Table.Tbody
+          className={
+            getPlayersState.isFetching || addPlayerState.isLoading
+              ? classes.disabled
+              : undefined
+          }
+        >
+          {rows}
+        </Table.Tbody>
       </Table>
     </Table.ScrollContainer>
   )

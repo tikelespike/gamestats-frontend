@@ -13,7 +13,12 @@ export interface LoginRequest {
 export interface Player {
   id: string
   name: string
-  ownerId: bigint
+  ownerId: bigint | null
+}
+
+export interface AddPlayerRequest {
+  name: string
+  ownerId: bigint | null
 }
 
 export const apiSlice = createApi({
@@ -28,6 +33,7 @@ export const apiSlice = createApi({
       return headers
     },
   }),
+  tagTypes: ["Players"],
   endpoints: builder => ({
     login: builder.mutation<UserResponse, LoginRequest>({
       query: credentials => ({
@@ -38,8 +44,18 @@ export const apiSlice = createApi({
     }),
     players: builder.query<Player[], void>({
       query: () => "/players",
+      providesTags: ["Players"],
+    }),
+    addPlayer: builder.mutation<Player, AddPlayerRequest>({
+      query: request => ({
+        url: "/players",
+        method: "POST",
+        body: request,
+      }),
+      invalidatesTags: ["Players"],
     }),
   }),
 })
 
-export const { useLoginMutation, usePlayersQuery } = apiSlice
+export const { useLoginMutation, usePlayersQuery, useAddPlayerMutation } =
+  apiSlice
