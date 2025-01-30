@@ -1,5 +1,5 @@
 import "./App.css"
-import { Box } from "@mantine/core"
+import { Box, Center, Loader } from "@mantine/core"
 import { Route, Routes } from "react-router-dom"
 import { Login } from "./features/auth/Login"
 import { PrivateOutlet } from "./utils/PrivateOutlet"
@@ -10,13 +10,14 @@ import CharacterManager from "./features/characters/CharacterManager"
 import PlayerManager from "./features/players/PlayerManager"
 import NavigateToDefault from "./utils/NavigateToDefault"
 import { NotFound } from "./features/notfound/NotFound"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { setToken } from "./features/auth/authSlice"
 import { jwtDecode } from "jwt-decode"
 import { useAppDispatch } from "./app/hooks"
 
 const App = () => {
   const dispatch = useAppDispatch()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const token =
@@ -27,21 +28,30 @@ const App = () => {
 
       if (!isExpired) dispatch(setToken({ token }))
     }
+    setLoading(false)
   }, [dispatch])
+
+  if (loading) {
+    return (
+      <Center>
+        <Loader top="40vh" color="blue" size="xl" type="bars" />
+      </Center>
+    )
+  }
 
   return (
     <Box>
       <Routes>
-        <Route element={<PublicOutlet />}>
-          <Route path="/login" element={<Login />} />
-        </Route>
-
         <Route element={<PrivateOutlet />}>
           <Route element={<MainLayout />}>
             <Route path="/manager/games" element={<GameManager />} />
             <Route path="/manager/characters" element={<CharacterManager />} />
             <Route path="/manager/players" element={<PlayerManager />} />
           </Route>
+        </Route>
+
+        <Route element={<PublicOutlet />}>
+          <Route path="/login" element={<Login />} />
         </Route>
 
         {/* Redirect "/" based on authentication */}
