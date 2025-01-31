@@ -11,14 +11,14 @@ export interface LoginRequest {
 }
 
 export interface Player {
-  id: string
+  id: number
   name: string
-  ownerId: bigint | null
+  ownerId: number | null
 }
 
 export interface AddPlayerRequest {
   name: string
-  ownerId: bigint | null
+  ownerId: number | null
 }
 
 export const apiSlice = createApi({
@@ -54,8 +54,19 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Players"],
     }),
+    deletePlayer: builder.mutation<void, number>({
+      query: id => ({
+        url: `/players/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Players"],
+    }),
   }),
 })
 
-export const { useLoginMutation, usePlayersQuery, useAddPlayerMutation } =
-  apiSlice
+export const {
+  useLoginMutation,
+  usePlayersQuery,
+  useAddPlayerMutation,
+  useDeletePlayerMutation,
+} = apiSlice

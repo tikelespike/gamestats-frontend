@@ -2,21 +2,40 @@ import { IconPencil, IconTrash } from "@tabler/icons-react"
 import {
   ActionIcon,
   Button,
+  Center,
   Group,
+  Loader,
+  Modal,
   Notification,
   Table,
   Text,
   TextInput,
 } from "@mantine/core"
-import type { AddPlayerRequest } from "../api/apiSlice"
-import { useAddPlayerMutation, usePlayersQuery } from "../api/apiSlice"
-import type React from "react"
+import type { AddPlayerRequest, Player } from "../api/apiSlice"
+import {
+  useAddPlayerMutation,
+  useDeletePlayerMutation,
+  usePlayersQuery,
+} from "../api/apiSlice"
+import React from "react"
 import { useForm } from "@mantine/form"
 import classes from "./PlayerManager.module.css"
+import { useDisclosure } from "@mantine/hooks"
 
 export default function PlayerManager() {
   const getPlayersState = usePlayersQuery()
   const [addPlayer, addPlayerState] = useAddPlayerMutation()
+  const [deletePlayer, deletePlayerState] = useDeletePlayerMutation()
+  const [playerToDelete, setPlayerToDelete] = React.useState<Player | null>(
+    null,
+  )
+  const [
+    deleteModalOpened,
+    { open: openDeleteModal, close: closeDeleteModal },
+  ] = useDisclosure()
+  // Even though RTK query provides us with a loading state, we need to keep the state loading
+  // until the exit transition of the modal has finished, which is after the RTK query isLoading becomes false
+  const [deleteLoading, setDeleteLoading] = React.useState<boolean>(false)
 
   const newPlayerForm = useForm<AddPlayerRequest>({
     initialValues: {
@@ -30,7 +49,11 @@ export default function PlayerManager() {
   })
 
   if (getPlayersState.isLoading) {
-    return <Text>Loading...</Text>
+    return (
+      <Center>
+        <Loader top="40vh" color="blue" size="xl" type="bars" />
+      </Center>
+    )
   }
   if (getPlayersState.isError || getPlayersState.data === undefined) {
     return (
@@ -49,7 +72,7 @@ export default function PlayerManager() {
     )
   }
 
-  const rows = getPlayersState.data.map(player => (
+  const rows = getPlayersState.data.map((player: Player) => (
     <Table.Tr key={player.id}>
       <Table.Td>
         <Group gap="sm">
@@ -70,7 +93,14 @@ export default function PlayerManager() {
           <ActionIcon variant="subtle" color="gray">
             <IconPencil size={16} stroke={1.5} />
           </ActionIcon>
-          <ActionIcon variant="subtle" color="red">
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            onClick={() => {
+              setPlayerToDelete(player)
+              openDeleteModal()
+            }}
+          >
             <IconTrash size={16} stroke={1.5} />
           </ActionIcon>
         </Group>
@@ -79,41 +109,77 @@ export default function PlayerManager() {
   ))
 
   return (
-    <Table.ScrollContainer minWidth={400}>
-      <form onSubmit={newPlayerForm.onSubmit(addPlayer)}>
-        <Group align="flex-end" mb="sm">
-          <TextInput
-            label="New player name"
-            placeholder="Enter player name"
-            {...newPlayerForm.getInputProps("name")}
-          />
+    <>
+      <Modal
+        opened={deleteModalOpened}
+        onClose={closeDeleteModal}
+        onExitTransitionEnd={() => setDeleteLoading(false)}
+        title={"Delete player"}
+      >
+        <Text>
+          Are you sure you want to delete player "{playerToDelete?.name}"? This
+          action cannot be undone.
+        </Text>
+        <Group mt="lg" justify="flex-end">
           <Button
-            loading={addPlayerState.isLoading}
-            loaderProps={{ type: "dots" }}
-            type={"submit"}
+            disabled={deleteLoading}
+            onClick={closeDeleteModal}
+            variant="default"
           >
-            Add Player
+            Cancel
+          </Button>
+          <Button
+            color="red"
+            loading={deleteLoading}
+            onClick={async () => {
+              setDeleteLoading(true)
+              if (playerToDelete) {
+                await deletePlayer(playerToDelete.id)
+              }
+              closeDeleteModal()
+            }}
+          >
+            Delete player
           </Button>
         </Group>
-      </form>
-      <Table verticalSpacing="md">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Associated Account</Table.Th>
-            <Table.Th />
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody
-          className={
-            getPlayersState.isFetching || addPlayerState.isLoading
-              ? classes.disabled
-              : undefined
-          }
-        >
-          {rows}
-        </Table.Tbody>
-      </Table>
-    </Table.ScrollContainer>
+      </Modal>
+
+      <Table.ScrollContainer minWidth={400}>
+        <form onSubmit={newPlayerForm.onSubmit(addPlayer)}>
+          <Group align="flex-end" mb="sm">
+            <TextInput
+              label="New player name"
+              placeholder="Enter player name"
+              {...newPlayerForm.getInputProps("name")}
+            />
+            <Button
+              loading={addPlayerState.isLoading}
+              loaderProps={{ type: "dots" }}
+              type={"submit"}
+            >
+              Add Player
+            </Button>
+          </Group>
+        </form>
+        <Table verticalSpacing="md">
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>Associated Account</Table.Th>
+              <Table.Th />
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody
+            className={
+              getPlayersState.isFetching || addPlayerState.isLoading
+                ? classes.disabled
+                : undefined
+            }
+          >
+            {rows}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+    </>
   )
 }
