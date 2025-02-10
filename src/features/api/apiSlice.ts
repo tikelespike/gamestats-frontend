@@ -32,6 +32,7 @@ export const apiSlice = createApi({
       }
       return headers
     },
+    timeout: 5000,
   }),
   tagTypes: ["Players"],
   endpoints: builder => ({
