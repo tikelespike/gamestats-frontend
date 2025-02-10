@@ -3,6 +3,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { AppShell, Burger, Group, Text } from "@mantine/core"
 import { NavBar } from "./NavBar"
 import { Outlet } from "react-router-dom"
+import { ColorSchemeButton } from "../../components/ColorSchemeButton"
 
 const MainLayout: React.FC = () => {
   const [opened, { toggle }] = useDisclosure()
@@ -14,9 +15,10 @@ const MainLayout: React.FC = () => {
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md">
+        <Group h="100%" px="md" justify="space-between">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Text size="xl">Blood Manager</Text>
+          <ColorSchemeButton />
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
