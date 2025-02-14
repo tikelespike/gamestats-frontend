@@ -18,7 +18,8 @@ export function CharacterCard({
   return (
     <Paper
       withBorder
-      shadow="lg"
+      shadow="sm"
+      display="flex"
       className={styles.characterCard}
       onClick={onClick}
       role="button"
