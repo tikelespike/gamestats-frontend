@@ -5,18 +5,31 @@ interface CharacterCardProps {
   name: string
   type: string
   icon: string
+  onClick?: () => void
 }
 
-export function CharacterCard(props: CharacterCardProps) {
+export function CharacterCard({
+  name,
+  type,
+  icon,
+  onClick,
+}: CharacterCardProps) {
   return (
-    <Paper shadow="lg" withBorder p="md" w="fit-content">
+    <Paper
+      shadow="lg"
+      withBorder
+      p="md"
+      w="fit-content"
+      onClick={onClick}
+      style={{ cursor: "pointer" }}
+    >
       <Stack gap="0" align="center">
-        <Avatar size={40} src={props.icon} radius={40} mb="sm" />
+        <Avatar size={40} src={icon} radius={40} mb="sm" />
         <Text fz="sm" fw={500}>
-          {props.name}
+          {name}
         </Text>
         <Text c="dimmed" fz="xs">
-          {props.type}
+          {type}
         </Text>
       </Stack>
     </Paper>

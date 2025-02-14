@@ -49,6 +49,7 @@ const CharacterManager = () => {
         name={character.name}
         type={character.type}
         icon={character.icon}
+        onClick={() => alert(1)}
       />
     </Box>
   ))
