@@ -144,7 +144,7 @@ export default function PlayerManager() {
         </Group>
       </Modal>
 
-      <Table.ScrollContainer minWidth={400}>
+      <Table.ScrollContainer minWidth={200}>
         <form onSubmit={newPlayerForm.onSubmit(addPlayer)}>
           <Group align="flex-end" mb="sm">
             <TextInput
@@ -165,7 +165,7 @@ export default function PlayerManager() {
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Name</Table.Th>
-              <Table.Th>Associated Account</Table.Th>
+              <Table.Th>Account</Table.Th>
               <Table.Th />
             </Table.Tr>
           </Table.Thead>
