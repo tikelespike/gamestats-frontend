@@ -1,12 +1,12 @@
-import type React from "react"
 import { useDisclosure } from "@mantine/hooks"
 import { AppShell, Burger, Group, Text } from "@mantine/core"
 import { NavBar } from "./NavBar"
 import { Outlet } from "react-router-dom"
 import { ColorSchemeButton } from "../../components/ColorSchemeButton"
+import type React from "react"
 
 const MainLayout: React.FC = () => {
-  const [opened, { toggle }] = useDisclosure()
+  const [opened, { toggle, close }] = useDisclosure()
 
   return (
     <AppShell
@@ -22,7 +22,7 @@ const MainLayout: React.FC = () => {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        <NavBar />
+        <NavBar onNavigate={close} />
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />

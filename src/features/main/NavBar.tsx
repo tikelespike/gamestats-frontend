@@ -19,7 +19,7 @@ const data = [
   { link: "/manager/users", label: "Users", icon: IconUserSquareRounded },
 ]
 
-export function NavBar() {
+export function NavBar({ onNavigate }: { onNavigate: () => void }) {
   const location = useLocation()
   const active = location.pathname
   const navigate = useNavigate()
@@ -40,6 +40,7 @@ export function NavBar() {
       onClick={event => {
         event.preventDefault()
         navigate(item.link)
+        onNavigate()
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
