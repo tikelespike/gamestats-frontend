@@ -1,11 +1,12 @@
 import React from "react"
-import { Avatar, Paper, Stack, Text } from "@mantine/core"
+import { Avatar, Paper, Text } from "@mantine/core"
+import styles from "./CharacterCard.module.css"
 
 interface CharacterCardProps {
   name: string
   type: string
   icon: string
-  onClick?: () => void
+  onClick: () => void // Required click handler to open modal
 }
 
 export function CharacterCard({
@@ -16,22 +17,21 @@ export function CharacterCard({
 }: CharacterCardProps) {
   return (
     <Paper
-      shadow="lg"
       withBorder
-      p="md"
-      w="fit-content"
+      shadow="lg"
+      className={styles.characterCard}
       onClick={onClick}
-      style={{ cursor: "pointer" }}
+      role="button"
+      tabIndex={0} // Allows keyboard navigation
+      onKeyDown={e => e.key === "Enter" && onClick()}
     >
-      <Stack gap="0" align="center">
-        <Avatar size={40} src={icon} radius={40} mb="sm" />
-        <Text fz="sm" fw={500}>
-          {name}
-        </Text>
-        <Text c="dimmed" fz="xs">
+      <Avatar size={50} src={icon} radius={50} my="xs" />
+      <div className={styles.textContainer}>
+        <Text fz="md">{name}</Text>
+        <Text c="dimmed" fz="sm">
           {type}
         </Text>
-      </Stack>
+      </div>
     </Paper>
   )
 }
