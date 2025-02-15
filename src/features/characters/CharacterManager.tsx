@@ -43,9 +43,8 @@ const data = [
 
 const CharacterManager = () => {
   const characters = data.map(character => (
-    <Box m="xs">
+    <Box m="xs" key={character.id}>
       <CharacterCard
-        key={character.id}
         name={character.name}
         type={character.type}
         icon={character.icon}
