@@ -5,20 +5,20 @@ import { Box } from "@mantine/core"
 const data = [
   {
     id: 1,
-    name: "Fortune Teller",
+    name: "Snake Charmer",
     type: "Townsfolk",
     icon: "https://script.bloodontheclocktower.com/images/icon/1 - Trouble Brewing/townsfolk/Fortune Teller_icon.webp",
   },
   {
     id: 2,
-    name: "Fortune Teller",
+    name: "Washerwoman",
     type: "Townsfolk",
     icon: "https://script.bloodontheclocktower.com/images/icon/1 - Trouble Brewing/townsfolk/Fortune Teller_icon.webp",
   },
   {
     id: 3,
-    name: "Fortune Teller",
-    type: "Townsfolk",
+    name: "Test",
+    type: "Outsider",
     icon: "https://script.bloodontheclocktower.com/images/icon/1 - Trouble Brewing/townsfolk/Fortune Teller_icon.webp",
   },
   {
