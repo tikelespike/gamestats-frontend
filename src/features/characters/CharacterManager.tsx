@@ -33,12 +33,6 @@ const data = [
     type: "Townsfolk",
     icon: "https://script.bloodontheclocktower.com/images/icon/1 - Trouble Brewing/townsfolk/Fortune Teller_icon.webp",
   },
-  {
-    id: 6,
-    name: "Fortune Teller",
-    type: "Townsfolk",
-    icon: "https://script.bloodontheclocktower.com/images/icon/1 - Trouble Brewing/townsfolk/Fortune Teller_icon.webp",
-  },
 ]
 
 const CharacterManager = () => {
@@ -54,9 +48,14 @@ const CharacterManager = () => {
   ))
 
   return (
-    <div>
-      <Box style={{ display: "flex", flexWrap: "wrap" }}>{characters}</Box>
-    </div>
+    <Box
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+      }}
+    >
+      {characters}
+    </Box>
   )
 }
 
