@@ -1,6 +1,8 @@
 import React from "react"
 import CharacterCard from "./CharacterCard"
-import { Box } from "@mantine/core"
+import { Box, Center, Loader } from "@mantine/core"
+import { useCharactersQuery } from "../api/apiSlice"
+import ErrorDisplay from "../../components/ErrorDisplay"
 
 const data = [
   {
@@ -36,12 +38,25 @@ const data = [
 ]
 
 const CharacterManager = () => {
-  const characters = data.map(character => (
+  const getCharactersState = useCharactersQuery()
+
+  if (getCharactersState.isLoading) {
+    return (
+      <Center>
+        <Loader top="40vh" color="blue" size="xl" type="bars" />
+      </Center>
+    )
+  }
+  if (getCharactersState.isError || getCharactersState.data === undefined) {
+    return <ErrorDisplay error={getCharactersState.error} />
+  }
+
+  const characterCards = getCharactersState.data.map(character => (
     <Box m="xs" key={character.id}>
       <CharacterCard
         name={character.name}
         type={character.type}
-        icon={character.icon}
+        icon={character.imageUrl}
         onClick={() => alert(1)}
       />
     </Box>
@@ -54,7 +69,7 @@ const CharacterManager = () => {
         flexWrap: "wrap",
       }}
     >
-      {characters}
+      {characterCards}
     </Box>
   )
 }

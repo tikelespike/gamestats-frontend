@@ -12,6 +12,7 @@ export interface LoginRequest {
 
 export interface Player {
   id: number
+  version: number
   name: string
   ownerId: number | null
 }
@@ -19,6 +20,24 @@ export interface Player {
 export interface AddPlayerRequest {
   name: string
   ownerId: number | null
+}
+
+export enum CharacterType {
+  Townsfolk = "townsfolk",
+  Outsider = "outsider",
+  Minion = "minion",
+  Demon = "demon",
+  Traveller = "traveller",
+}
+
+export interface Character {
+  id: number
+  version: number
+  name: string
+  scriptToolIdentifier: string | null
+  type: CharacterType
+  wikiPageUrl: string | null
+  imageUrl: string | null
 }
 
 export const apiSlice = createApi({
@@ -34,7 +53,7 @@ export const apiSlice = createApi({
     },
     timeout: 5000,
   }),
-  tagTypes: ["Players"],
+  tagTypes: ["Players", "Characters"],
   endpoints: builder => ({
     login: builder.mutation<UserResponse, LoginRequest>({
       query: credentials => ({
@@ -62,6 +81,10 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Players"],
     }),
+    characters: builder.query<Character[], void>({
+      query: () => "/characters",
+      providesTags: ["Characters"],
+    }),
   }),
 })
 
@@ -70,4 +93,5 @@ export const {
   usePlayersQuery,
   useAddPlayerMutation,
   useDeletePlayerMutation,
+  useCharactersQuery,
 } = apiSlice

@@ -6,7 +6,6 @@ import {
   Group,
   Loader,
   Modal,
-  Notification,
   Table,
   Text,
   TextInput,
@@ -21,6 +20,7 @@ import React from "react"
 import { useForm } from "@mantine/form"
 import classes from "./PlayerManager.module.css"
 import { useDisclosure } from "@mantine/hooks"
+import ErrorDisplay from "../../components/ErrorDisplay"
 
 export default function PlayerManager() {
   const getPlayersState = usePlayersQuery()
@@ -56,20 +56,7 @@ export default function PlayerManager() {
     )
   }
   if (getPlayersState.isError || getPlayersState.data === undefined) {
-    return (
-      <Notification color="red" mt="md">
-        {getPlayersState.error &&
-        "data" in getPlayersState.error &&
-        (
-          getPlayersState.error.data as {
-            detail: string
-          }
-        ).detail
-          ? "Error: " +
-            (getPlayersState.error.data as { detail: string }).detail
-          : "Failed to fetch players"}
-      </Notification>
-    )
+    return <ErrorDisplay error={getPlayersState.error} />
   }
 
   const rows = getPlayersState.data.map((player: Player) => (
