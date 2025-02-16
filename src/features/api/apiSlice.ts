@@ -40,6 +40,14 @@ export interface Character {
   imageUrl: string | null
 }
 
+export interface AddCharacterRequest {
+  name: string
+  scriptToolIdentifier: string | null
+  type: CharacterType
+  wikiPageUrl: string | null
+  imageUrl: string | null
+}
+
 export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL as string,
@@ -84,6 +92,14 @@ export const apiSlice = createApi({
     characters: builder.query<Character[], void>({
       query: () => "/characters",
       providesTags: ["Characters"],
+    }),
+    addCharacter: builder.mutation<Character, AddCharacterRequest>({
+      query: request => ({
+        url: "/characters",
+        method: "POST",
+        body: request,
+      }),
+      invalidatesTags: ["Characters"],
     }),
   }),
 })
