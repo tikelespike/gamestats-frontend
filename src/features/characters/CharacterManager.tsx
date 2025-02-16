@@ -3,6 +3,8 @@ import CharacterCard from "./CharacterCard"
 import { Box, Center, Loader } from "@mantine/core"
 import { useCharactersQuery } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
+import AddCharacterCard from "./AddCharacterCard"
+import styles from "./CharacterManager.module.css"
 
 const data = [
   {
@@ -52,23 +54,18 @@ const CharacterManager = () => {
   }
 
   const characterCards = getCharactersState.data.map(character => (
-    <Box m="xs" key={character.id}>
-      <CharacterCard
-        name={character.name}
-        type={character.type}
-        icon={character.imageUrl}
-        onClick={() => alert(1)}
-      />
-    </Box>
+    <CharacterCard
+      key={character.id}
+      name={character.name}
+      type={character.type}
+      icon={character.imageUrl}
+      onClick={() => alert(1)}
+    />
   ))
 
   return (
-    <Box
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-      }}
-    >
+    <Box className={styles.container}>
+      <AddCharacterCard onClick={() => alert(1)} />
       {characterCards}
     </Box>
   )
