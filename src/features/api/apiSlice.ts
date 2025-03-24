@@ -36,7 +36,7 @@ export interface Character {
   name: string
   scriptToolIdentifier: string | null
   type: CharacterType
-  wikiPageUrl: string | null
+  wikiPageLink: string | null
   imageUrl: string | null
 }
 
@@ -44,7 +44,7 @@ export interface AddCharacterRequest {
   name: string
   scriptToolIdentifier: string | null
   type: CharacterType
-  wikiPageUrl: string | null
+  wikiPageLink: string | null
   imageUrl: string | null
 }
 
@@ -110,4 +110,5 @@ export const {
   useAddPlayerMutation,
   useDeletePlayerMutation,
   useCharactersQuery,
+  useAddCharacterMutation,
 } = apiSlice
