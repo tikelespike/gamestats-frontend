@@ -46,6 +46,12 @@ const CharacterManager = () => {
         value && value.trim().length > 0 ? null : "Character name is required",
     },
   })
+
+  const handleOpenAddModal = () => {
+    newCharacterForm.reset()
+    openAddModal()
+  }
+
   const [addCharacter, addCharacterState] = useAddCharacterMutation()
   const handleAddCharacter = async (values: AddCharacterRequest) => {
     console.log(values)
@@ -149,7 +155,7 @@ const CharacterManager = () => {
         </form>
       </Modal>
       <Box className={styles.container}>
-        <AddCharacterCard onClick={openAddModal} />
+        <AddCharacterCard onClick={handleOpenAddModal} />
         {characterCards}
       </Box>
     </>
