@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import CharacterCard from "./CharacterCard"
 import {
   ActionIcon,
@@ -29,6 +29,7 @@ import { IconWand } from "@tabler/icons-react"
 
 const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
+  const [addLoading, setAddLoading] = useState<boolean>(false)
   const getCharactersState = useCharactersQuery()
   const [addModalOpened, { open: openAddModal, close: closeAddModal }] =
     useDisclosure(false)
@@ -54,12 +55,14 @@ const CharacterManager = () => {
 
   const [addCharacter, addCharacterState] = useAddCharacterMutation()
   const handleAddCharacter = async (values: AddCharacterRequest) => {
-    console.log(values)
+    setAddLoading(true)
     try {
       const response = await addCharacter(values).unwrap()
     } catch (err) {
       console.error("Creation failed:", err)
+      return
     }
+    closeAddModal()
   }
 
   if (getCharactersState.isLoading) {
@@ -88,6 +91,7 @@ const CharacterManager = () => {
       <Modal
         opened={addModalOpened}
         onClose={closeAddModal}
+        onExitTransitionEnd={() => setAddLoading(false)}
         title="Add Character"
         centered
         size="md"
@@ -97,6 +101,7 @@ const CharacterManager = () => {
             <Grid.Col span={6}>
               <TextInput
                 label="Character Name"
+                disabled={addLoading}
                 placeholder="Fortune Teller"
                 withAsterisk
                 {...newCharacterForm.getInputProps("name")}
@@ -105,6 +110,7 @@ const CharacterManager = () => {
                     size={32}
                     color={theme.primaryColor}
                     variant="transparent"
+                    disabled={addLoading}
                   >
                     <IconWand size={18} stroke={1.5} />
                   </ActionIcon>
@@ -114,6 +120,7 @@ const CharacterManager = () => {
             <Grid.Col span={6}>
               <TextInput
                 label="Script Tool Identifier"
+                disabled={addLoading}
                 placeholder="fortuneteller"
                 {...newCharacterForm.getInputProps("scriptToolIdentifier")}
               />
@@ -121,6 +128,7 @@ const CharacterManager = () => {
             <Grid.Col>
               <SegmentedControl
                 fullWidth
+                disabled={addLoading}
                 data={[
                   { label: "Townsfolk", value: "townsfolk" },
                   { label: "Outsider", value: "outsider" },
@@ -134,6 +142,7 @@ const CharacterManager = () => {
             <Grid.Col>
               <TextInput
                 label="Wiki Page URL"
+                disabled={addLoading}
                 placeholder="https://wiki.bloodontheclocktower.com/Fortune_Teller"
                 {...newCharacterForm.getInputProps("wikiPageLink")}
               />
@@ -141,6 +150,7 @@ const CharacterManager = () => {
             <Grid.Col>
               <TextInput
                 label="Image URL"
+                disabled={addLoading}
                 placeholder="https://script.bloodontheclocktower.com/images/icon/1%20-%20Trouble%20Brewing/townsfolk/Fortune%20Teller_icon.webp"
                 {...newCharacterForm.getInputProps("imageUrl")}
               />
@@ -148,7 +158,7 @@ const CharacterManager = () => {
           </Grid>
 
           <Group mt="xl" justify="flex-end">
-            <Button type={"submit"} loading={addCharacterState.isLoading}>
+            <Button type={"submit"} loading={addLoading}>
               Create
             </Button>
           </Group>
