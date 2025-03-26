@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import CharacterCard from "./CharacterCard"
 import {
   ActionIcon,
+  Autocomplete,
   Box,
   Button,
   Center,
@@ -19,6 +20,7 @@ import {
   CharacterType,
   useAddCharacterMutation,
   useCharactersQuery,
+  useOfficialCharactersQuery,
 } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
 import AddCharacterCard from "./AddCharacterCard"
@@ -31,8 +33,17 @@ const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
   const [addLoading, setAddLoading] = useState<boolean>(false)
   const getCharactersState = useCharactersQuery()
+  const getOfficialCharactersState = useOfficialCharactersQuery()
   const [addModalOpened, { open: openAddModal, close: closeAddModal }] =
     useDisclosure(false)
+
+  const officialCharacters: AddCharacterRequest[] =
+    getOfficialCharactersState.isSuccess && getOfficialCharactersState.data
+      ? getOfficialCharactersState.data
+      : []
+  const officialNames: string[] = officialCharacters.map(
+    character => character.name,
+  )
 
   const newCharacterForm = useForm<AddCharacterRequest>({
     initialValues: {
@@ -63,6 +74,22 @@ const CharacterManager = () => {
       return
     }
     closeAddModal()
+  }
+
+  const handleMagicComplete = () => {
+    const officialCharacter = officialCharacters.find(
+      character => character.name === newCharacterForm.values.name,
+    )
+    if (officialCharacter == undefined) {
+      return
+    }
+    newCharacterForm.setValues({
+      ...newCharacterForm.values,
+      scriptToolIdentifier: officialCharacter.scriptToolIdentifier,
+      type: officialCharacter.type,
+      wikiPageLink: officialCharacter.wikiPageLink,
+      imageUrl: officialCharacter.imageUrl,
+    })
   }
 
   if (getCharactersState.isLoading) {
@@ -99,18 +126,28 @@ const CharacterManager = () => {
         <form onSubmit={newCharacterForm.onSubmit(handleAddCharacter)}>
           <Grid gutter={"lg"}>
             <Grid.Col span={6}>
-              <TextInput
+              <Autocomplete
                 label="Character Name"
                 disabled={addLoading}
                 placeholder="Fortune Teller"
                 withAsterisk
+                data={officialNames.filter(
+                  name =>
+                    !getCharactersState.data
+                      .map(character => character.name)
+                      .includes(name),
+                )}
                 {...newCharacterForm.getInputProps("name")}
                 rightSection={
                   <ActionIcon
                     size={32}
                     color={theme.primaryColor}
                     variant="transparent"
-                    disabled={addLoading}
+                    disabled={
+                      addLoading ||
+                      !officialNames.includes(newCharacterForm.values.name)
+                    }
+                    onClick={handleMagicComplete}
                   >
                     <IconWand size={18} stroke={1.5} />
                   </ActionIcon>
