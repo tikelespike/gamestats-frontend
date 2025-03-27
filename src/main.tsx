@@ -7,6 +7,8 @@ import "./index.css"
 import { MantineProvider } from "@mantine/core"
 import { BrowserRouter } from "react-router-dom"
 import "@mantine/core/styles.css"
+import "@mantine/notifications/styles.css"
+import { Notifications } from "@mantine/notifications"
 
 const container = document.getElementById("root")
 
@@ -17,6 +19,7 @@ if (container) {
     <React.StrictMode>
       <Provider store={store}>
         <MantineProvider defaultColorScheme="dark">
+          <Notifications />
           <BrowserRouter>
             <App />
           </BrowserRouter>

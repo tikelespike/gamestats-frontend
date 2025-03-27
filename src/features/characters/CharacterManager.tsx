@@ -1,5 +1,6 @@
-import React, { useState } from "react"
+import React from "react"
 import CharacterCard from "./CharacterCard"
+import type { MantineTheme } from "@mantine/core"
 import {
   ActionIcon,
   Autocomplete,
@@ -9,16 +10,14 @@ import {
   Grid,
   Group,
   Loader,
-  MantineTheme,
   Modal,
   SegmentedControl,
   Select,
   TextInput,
   useMantineTheme,
 } from "@mantine/core"
+import type { AddCharacterRequest, Character } from "../api/apiSlice"
 import {
-  AddCharacterRequest,
-  Character,
   CharacterType,
   useAddCharacterMutation,
   useCharactersQuery,
@@ -31,10 +30,11 @@ import styles from "./CharacterManager.module.css"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { useForm } from "@mantine/form"
 import { IconWand } from "@tabler/icons-react"
+import { notifications } from "@mantine/notifications"
 
 const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
-  const [mutationLoading, setMutationLoading] = useState<boolean>(false)
+  const [mutationLoading, setMutationLoading] = React.useState<boolean>(false)
   const getCharactersState = useCharactersQuery()
   const getOfficialCharactersState = useOfficialCharactersQuery()
   const [addModalOpened, { open: openAddModal, close: closeAddModal }] =
@@ -118,6 +118,15 @@ const CharacterManager = () => {
       await addCharacter(values).unwrap()
     } catch (err) {
       console.error("Creation failed:", err)
+      notifications.show({
+        title: "Creation failed",
+        message:
+          "Character could not be created (error code " + err.status + ")",
+        color: "red",
+        autoClose: false,
+        position: "top-center",
+      })
+      setMutationLoading(false)
       return
     }
     closeAddModal()
@@ -128,6 +137,20 @@ const CharacterManager = () => {
       await editCharacter(values).unwrap()
     } catch (err) {
       console.error("Update failed:", err)
+      let message: string =
+        "Character could not be updated (error code " + err.status + ")"
+      if (err.status === 409) {
+        message =
+          "The character was already updated by someone else. Saving your changes may overwrite their changes."
+      }
+      notifications.show({
+        title: "Update failed",
+        message: message,
+        color: "red",
+        autoClose: false,
+        position: "top-center",
+      })
+      setMutationLoading(false)
       return
     }
     closeEditModal()
