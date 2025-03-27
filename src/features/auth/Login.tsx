@@ -64,7 +64,7 @@ export const Login = () => {
       dispatch(setToken({ token: response.accessToken }))
       navigate("/manager/games")
     } catch (err) {
-      console.error("Login failed:", err)
+      console.error("Login failed:", JSON.stringify(err))
     }
   }
 
@@ -84,7 +84,7 @@ export const Login = () => {
             "data" in error &&
             (error.data as { message: string }).message
               ? (error.data as { message: string }).message
-              : "Login failed"}
+              : "Login failed: " + JSON.stringify(error)}
           </Notification>
         )}
         <form onSubmit={form.onSubmit(handleSubmit)}>

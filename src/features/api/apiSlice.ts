@@ -101,6 +101,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Characters"],
     }),
+    editCharacter: builder.mutation<Character, Character>({
+      query: request => ({
+        url: `/characters/${request.id}`,
+        method: "PUT",
+        body: request,
+      }),
+      invalidatesTags: ["Characters"],
+    }),
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
     }),
@@ -114,5 +122,6 @@ export const {
   useDeletePlayerMutation,
   useCharactersQuery,
   useAddCharacterMutation,
+  useEditCharacterMutation,
   useOfficialCharactersQuery,
 } = apiSlice

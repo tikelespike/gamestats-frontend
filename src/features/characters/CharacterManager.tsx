@@ -12,30 +12,36 @@ import {
   MantineTheme,
   Modal,
   SegmentedControl,
+  Select,
   TextInput,
   useMantineTheme,
 } from "@mantine/core"
 import {
   AddCharacterRequest,
+  Character,
   CharacterType,
   useAddCharacterMutation,
   useCharactersQuery,
+  useEditCharacterMutation,
   useOfficialCharactersQuery,
 } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
 import AddCharacterCard from "./AddCharacterCard"
 import styles from "./CharacterManager.module.css"
-import { useDisclosure } from "@mantine/hooks"
+import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { useForm } from "@mantine/form"
 import { IconWand } from "@tabler/icons-react"
 
 const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
-  const [addLoading, setAddLoading] = useState<boolean>(false)
+  const [mutationLoading, setMutationLoading] = useState<boolean>(false)
   const getCharactersState = useCharactersQuery()
   const getOfficialCharactersState = useOfficialCharactersQuery()
   const [addModalOpened, { open: openAddModal, close: closeAddModal }] =
     useDisclosure(false)
+  const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
+    useDisclosure(false)
+  const isSmallScreen = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
 
   const officialCharacters: AddCharacterRequest[] =
     getOfficialCharactersState.isSuccess && getOfficialCharactersState.data
@@ -45,8 +51,32 @@ const CharacterManager = () => {
     character => character.name,
   )
 
+  const selectTypeData = [
+    { label: "Townsfolk", value: "townsfolk" },
+    { label: "Outsider", value: "outsider" },
+    { label: "Minion", value: "minion" },
+    { label: "Demon", value: "demon" },
+    { label: "Traveller", value: "traveller" },
+  ]
+
   const newCharacterForm = useForm<AddCharacterRequest>({
     initialValues: {
+      name: "",
+      scriptToolIdentifier: null,
+      type: CharacterType.Townsfolk,
+      wikiPageLink: null,
+      imageUrl: null,
+    },
+    validate: {
+      name: value =>
+        value && value.trim().length > 0 ? null : "Character name is required",
+    },
+  })
+
+  const editCharacterForm = useForm<Character>({
+    initialValues: {
+      id: 0,
+      version: 0,
       name: "",
       scriptToolIdentifier: null,
       type: CharacterType.Townsfolk,
@@ -64,23 +94,50 @@ const CharacterManager = () => {
     openAddModal()
   }
 
-  const [addCharacter, addCharacterState] = useAddCharacterMutation()
+  const handleOpenEditModal = (id: number) => {
+    editCharacterForm.reset()
+    if (getCharactersState.data === undefined) {
+      return
+    }
+    const initialValues = getCharactersState.data.find(
+      character => character.id === id,
+    )
+    if (initialValues === undefined) {
+      console.error("Character that should be edited not found")
+      return
+    }
+    editCharacterForm.setValues(initialValues)
+    openEditModal()
+  }
+
+  const [addCharacter] = useAddCharacterMutation()
+  const [editCharacter] = useEditCharacterMutation()
   const handleAddCharacter = async (values: AddCharacterRequest) => {
-    setAddLoading(true)
+    setMutationLoading(true)
     try {
-      const response = await addCharacter(values).unwrap()
+      await addCharacter(values).unwrap()
     } catch (err) {
       console.error("Creation failed:", err)
       return
     }
     closeAddModal()
   }
+  const handleEditCharacter = async (values: Character) => {
+    setMutationLoading(true)
+    try {
+      await editCharacter(values).unwrap()
+    } catch (err) {
+      console.error("Update failed:", err)
+      return
+    }
+    closeEditModal()
+  }
 
   const handleMagicComplete = () => {
     const officialCharacter = officialCharacters.find(
       character => character.name === newCharacterForm.values.name,
     )
-    if (officialCharacter == undefined) {
+    if (officialCharacter === undefined) {
       return
     }
     newCharacterForm.setValues({
@@ -109,7 +166,7 @@ const CharacterManager = () => {
       name={character.name}
       type={character.type}
       icon={character.imageUrl}
-      onClick={() => alert(1)}
+      onClick={() => handleOpenEditModal(character.id)}
     />
   ))
 
@@ -118,7 +175,7 @@ const CharacterManager = () => {
       <Modal
         opened={addModalOpened}
         onClose={closeAddModal}
-        onExitTransitionEnd={() => setAddLoading(false)}
+        onExitTransitionEnd={() => setMutationLoading(false)}
         title="Add Character"
         centered
         size="md"
@@ -128,7 +185,7 @@ const CharacterManager = () => {
             <Grid.Col span={6}>
               <Autocomplete
                 label="Character Name"
-                disabled={addLoading}
+                disabled={mutationLoading}
                 placeholder="Fortune Teller"
                 withAsterisk
                 data={officialNames.filter(
@@ -144,7 +201,7 @@ const CharacterManager = () => {
                     color={theme.primaryColor}
                     variant="transparent"
                     disabled={
-                      addLoading ||
+                      mutationLoading ||
                       !officialNames.includes(newCharacterForm.values.name)
                     }
                     onClick={handleMagicComplete}
@@ -157,29 +214,33 @@ const CharacterManager = () => {
             <Grid.Col span={6}>
               <TextInput
                 label="Script Tool Identifier"
-                disabled={addLoading}
+                disabled={mutationLoading}
                 placeholder="fortuneteller"
                 {...newCharacterForm.getInputProps("scriptToolIdentifier")}
               />
             </Grid.Col>
             <Grid.Col>
-              <SegmentedControl
-                fullWidth
-                disabled={addLoading}
-                data={[
-                  { label: "Townsfolk", value: "townsfolk" },
-                  { label: "Outsider", value: "outsider" },
-                  { label: "Minion", value: "minion" },
-                  { label: "Demon", value: "demon" },
-                  { label: "Traveller", value: "traveller" },
-                ]}
-                {...newCharacterForm.getInputProps("type")}
-              />
+              {isSmallScreen ? (
+                <Select
+                  label="Character Type"
+                  disabled={mutationLoading}
+                  data={selectTypeData}
+                  placeholder={"Select"}
+                  {...newCharacterForm.getInputProps("type")}
+                />
+              ) : (
+                <SegmentedControl
+                  fullWidth
+                  disabled={mutationLoading}
+                  data={selectTypeData}
+                  {...newCharacterForm.getInputProps("type")}
+                />
+              )}
             </Grid.Col>
             <Grid.Col>
               <TextInput
                 label="Wiki Page URL"
-                disabled={addLoading}
+                disabled={mutationLoading}
                 placeholder="https://wiki.bloodontheclocktower.com/Fortune_Teller"
                 {...newCharacterForm.getInputProps("wikiPageLink")}
               />
@@ -187,7 +248,7 @@ const CharacterManager = () => {
             <Grid.Col>
               <TextInput
                 label="Image URL"
-                disabled={addLoading}
+                disabled={mutationLoading}
                 placeholder="https://script.bloodontheclocktower.com/images/icon/1%20-%20Trouble%20Brewing/townsfolk/Fortune%20Teller_icon.webp"
                 {...newCharacterForm.getInputProps("imageUrl")}
               />
@@ -195,12 +256,94 @@ const CharacterManager = () => {
           </Grid>
 
           <Group mt="xl" justify="flex-end">
-            <Button type={"submit"} loading={addLoading}>
+            <Button type={"submit"} loading={mutationLoading}>
               Create
             </Button>
           </Group>
         </form>
       </Modal>
+
+      <Modal
+        opened={editModalOpened}
+        onClose={closeEditModal}
+        onExitTransitionEnd={() => setMutationLoading(false)}
+        title="Edit Character"
+        centered
+        size="md"
+      >
+        <form onSubmit={editCharacterForm.onSubmit(handleEditCharacter)}>
+          <Grid gutter={"lg"}>
+            <Grid.Col span={6}>
+              <Autocomplete
+                label="Character Name"
+                disabled={mutationLoading}
+                placeholder="Fortune Teller"
+                withAsterisk
+                data={officialNames}
+                {...editCharacterForm.getInputProps("name")}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Script Tool Identifier"
+                disabled={mutationLoading}
+                placeholder="fortuneteller"
+                {...editCharacterForm.getInputProps("scriptToolIdentifier")}
+              />
+            </Grid.Col>
+            <Grid.Col>
+              {isSmallScreen ? (
+                <Select
+                  label="Character Type"
+                  disabled={mutationLoading}
+                  data={selectTypeData}
+                  placeholder={"Select"}
+                  {...editCharacterForm.getInputProps("type")}
+                />
+              ) : (
+                <SegmentedControl
+                  fullWidth
+                  disabled={mutationLoading}
+                  data={selectTypeData}
+                  {...editCharacterForm.getInputProps("type")}
+                />
+              )}
+            </Grid.Col>
+            <Grid.Col>
+              <TextInput
+                label="Wiki Page URL"
+                disabled={mutationLoading}
+                placeholder="https://wiki.bloodontheclocktower.com/Fortune_Teller"
+                {...editCharacterForm.getInputProps("wikiPageLink")}
+              />
+            </Grid.Col>
+            <Grid.Col>
+              <TextInput
+                label="Image URL"
+                disabled={mutationLoading}
+                placeholder="https://script.bloodontheclocktower.com/images/icon/1%20-%20Trouble%20Brewing/townsfolk/Fortune%20Teller_icon.webp"
+                {...editCharacterForm.getInputProps("imageUrl")}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, xs: 6 }}>
+              <Button
+                fullWidth
+                variant={"outline"}
+                color={"red"}
+                loading={mutationLoading}
+              >
+                Delete
+              </Button>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, xs: 6 }}>
+              <Button fullWidth type={"submit"} loading={mutationLoading}>
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </Modal>
+
       <Box className={styles.container}>
         <AddCharacterCard onClick={handleOpenAddModal} />
         {characterCards}
