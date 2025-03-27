@@ -102,7 +102,10 @@ export const Login = () => {
             {...form.getInputProps("password")}
           />
           <Group justify="space-between" mt="lg">
-            <Checkbox label="Remember me" />
+            <Checkbox
+              label="Remember me"
+              {...form.getInputProps("rememberMe")}
+            />
             <Anchor component="button" size="sm">
               Forgot password?
             </Anchor>
