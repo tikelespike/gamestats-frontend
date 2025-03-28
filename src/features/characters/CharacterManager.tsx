@@ -349,6 +349,7 @@ const CharacterManager = () => {
           title="Edit Character"
           centered
           size="md"
+          fullScreen={isSmallScreen}
         >
           <form onSubmit={editCharacterForm.onSubmit(handleEditCharacter)}>
             <Grid gutter={"lg"}>
