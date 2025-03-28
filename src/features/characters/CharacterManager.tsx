@@ -121,6 +121,7 @@ const CharacterManager = () => {
       notifications.show({
         title: "Creation failed",
         message:
+          // @ts-ignore
           "Character could not be created (error code " + err.status + ")",
         color: "red",
         autoClose: false,
@@ -138,7 +139,9 @@ const CharacterManager = () => {
     } catch (err) {
       console.error("Update failed:", err)
       let message: string =
+        // @ts-ignore
         "Character could not be updated (error code " + err.status + ")"
+      // @ts-ignore
       if (err.status === 409) {
         message =
           "The character was already updated by someone else. Saving your changes may overwrite their changes."
@@ -183,15 +186,17 @@ const CharacterManager = () => {
     return <ErrorDisplay error={getCharactersState.error} />
   }
 
-  const characterCards = getCharactersState.data.map(character => (
-    <CharacterCard
-      key={character.id}
-      name={character.name}
-      type={character.type}
-      icon={character.imageUrl}
-      onClick={() => handleOpenEditModal(character.id)}
-    />
-  ))
+  const characterCards = getCharactersState.data
+    .toSorted((a, b) => a.name.localeCompare(b.name))
+    .map(character => (
+      <CharacterCard
+        key={character.id}
+        name={character.name}
+        type={character.type}
+        icon={character.imageUrl}
+        onClick={() => handleOpenEditModal(character.id)}
+      />
+    ))
 
   return (
     <>
