@@ -17,3 +17,6 @@ npm run dev
 There is currently no Dockerfile yet.
 
 Make sure to set the needed environment variables, for example via a `.env` file. You can use the example envfile for reference.
+
+## Documentation
+The frontend is built using [React](https://react.dev/), [Redux](https://redux-toolkit.js.org/)/RTK Query and [Mantine](https://mantine.dev/). Currently, there is no other documentation available.
