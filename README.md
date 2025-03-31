@@ -1,27 +1,19 @@
-# vite-template-redux
+<img src="https://github.com/user-attachments/assets/8c96711e-f640-4c2b-8284-a052219f719b" alt="drawing" width="200"/>
 
-Uses [Vite](https://vitejs.dev/), [Vitest](https://vitest.dev/), and [React Testing Library](https://github.com/testing-library/react-testing-library) to create a modern [React](https://react.dev/) app compatible with [Create React App](https://create-react-app.dev/)
+# Blood Manager Frontend
+Blood Manager is an open-source, inofficial web tool to track [Blood on the Clocktower](https://bloodontheclocktower.com/) games.
+This repository contains the React frontend. You can find the backend [here](https://github.com/tikelespike/gamestats).
+
+Please note that this project is a very early work in progress.
+The vision is that this tool will allow groups to track their games, player statistics like win rate or rate of being in good/evil team, characters already played, achievements, a level/xp system...
+
+## Running the frontend
+Simply run:
 
 ```sh
-npx degit reduxjs/redux-templates/packages/vite-template-redux my-app
+npm run dev
 ```
 
-## Goals
+There is currently no Dockerfile yet.
 
-- Easy migration from Create React App or Vite
-- As beginner friendly as Create React App
-- Optimized performance compared to Create React App
-- Customizable without ejecting
-
-## Scripts
-
-- `dev`/`start` - start dev server and open browser
-- `build` - build for production
-- `preview` - locally preview production build
-- `test` - launch test runner
-
-## Inspiration
-
-- [Create React App](https://github.com/facebook/create-react-app/tree/main/packages/cra-template)
-- [Vite](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react)
-- [Vitest](https://github.com/vitest-dev/vitest/tree/main/examples/react-testing-lib)
+Make sure to set the needed environment variables, for example via a `.env` file. You can use the example envfile for reference.
