@@ -70,7 +70,7 @@ export const apiSlice = createApi({
     },
     timeout: 5000,
   }),
-  tagTypes: ["Players", "Characters"],
+  tagTypes: ["Players", "Characters", "Scripts"],
   endpoints: builder => ({
     login: builder.mutation<UserResponse, LoginRequest>({
       query: credentials => ({
@@ -128,6 +128,10 @@ export const apiSlice = createApi({
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
     }),
+    scripts: builder.query<Script[], void>({
+      query: () => "/scripts",
+      providesTags: ["Scripts"],
+    }),
   }),
 })
 
@@ -141,4 +145,5 @@ export const {
   useEditCharacterMutation,
   useDeleteCharacterMutation,
   useOfficialCharactersQuery,
+  useScriptsQuery,
 } = apiSlice

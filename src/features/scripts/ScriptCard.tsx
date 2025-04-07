@@ -66,9 +66,13 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
         </Group>
 
         <Group justify="space-between" align="flex-start">
-          {script.description && (
+          {script.description ? (
             <Text size="sm" c="dimmed" style={{ flex: 1 }}>
               {truncate(script.description, 85)}
+            </Text>
+          ) : (
+            <Text size="sm" c="dimmed" style={{ flex: 1 }}>
+              <i>No description</i>
             </Text>
           )}
           <Group gap="xs" ml="md">
