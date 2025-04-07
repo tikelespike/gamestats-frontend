@@ -32,7 +32,7 @@ import AddCharacterCard from "./AddCharacterCard"
 import styles from "./CharacterManager.module.css"
 import { useMediaQuery } from "@mantine/hooks"
 import { useForm } from "@mantine/form"
-import { IconWand } from "@tabler/icons-react"
+import { IconExternalLink, IconWand } from "@tabler/icons-react"
 import { notifications } from "@mantine/notifications"
 import { modals } from "@mantine/modals"
 
@@ -244,6 +244,7 @@ const CharacterManager = () => {
     })
   }
 
+  // @ts-ignore
   return (
     <>
       <Modal.Stack>
@@ -318,6 +319,22 @@ const CharacterManager = () => {
                   disabled={operationLoading}
                   placeholder="https://wiki.bloodontheclocktower.com/Fortune_Teller"
                   {...newCharacterForm.getInputProps("wikiPageLink")}
+                  rightSection={
+                    newCharacterForm.getValues().wikiPageLink && (
+                      <ActionIcon
+                        size={32}
+                        color={"blue"}
+                        variant="transparent"
+                        component="a"
+                        // @ts-ignore we checked above that the link is non-null
+                        href={newCharacterForm.getValues().wikiPageLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <IconExternalLink size={16} />
+                      </ActionIcon>
+                    )
+                  }
                 />
               </Grid.Col>
               <Grid.Col>
@@ -392,6 +409,22 @@ const CharacterManager = () => {
                   label="Wiki Page URL"
                   disabled={operationLoading}
                   placeholder="https://wiki.bloodontheclocktower.com/Fortune_Teller"
+                  rightSection={
+                    editCharacterForm.getValues().wikiPageLink && (
+                      <ActionIcon
+                        size={32}
+                        color={"blue"}
+                        variant="transparent"
+                        component="a"
+                        // @ts-ignore we checked above that the link is non-null
+                        href={editCharacterForm.getValues().wikiPageLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <IconExternalLink size={16} />
+                      </ActionIcon>
+                    )
+                  }
                   {...editCharacterForm.getInputProps("wikiPageLink")}
                 />
               </Grid.Col>
