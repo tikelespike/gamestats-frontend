@@ -3,6 +3,7 @@ import { IconEdit, IconExternalLink, IconTrash } from "@tabler/icons-react"
 import type { Script } from "../api/apiSlice"
 import { useCharactersQuery } from "../api/apiSlice"
 import { truncate } from "../../utils/utils"
+import styles from "./ScriptCard.module.css"
 
 interface ScriptCardProps {
   script: Script
@@ -17,7 +18,14 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
     characters?.filter(char => script.characterIds.includes(char.id)) || []
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder maw={600}>
+    <Card
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+      maw={600}
+      className={styles.scriptCard}
+    >
       <Stack gap="xs">
         <Group justify="space-between" align="flex-start">
           <Text fw={500} size="lg">

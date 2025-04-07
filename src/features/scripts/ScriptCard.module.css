@@ -1,0 +1,15 @@
+.scriptCard {
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
+    cursor: pointer;
+}
+
+.scriptCard:hover {
+    background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+    transform: scale(1.01);
+    box-shadow: var(--mantine-shadow-lg);
+}
+
+.scriptCard:active {
+    transform: scale(1.0);
+    box-shadow: var(--mantine-shadow-sm);
+} 

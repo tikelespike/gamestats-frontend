@@ -55,7 +55,7 @@ const ScriptManager = () => {
     />
   ))
   return (
-    <Center>
+    <Center mt={"xl"}>
       <Stack gap={"lg"}>{scriptCards}</Stack>
     </Center>
   )
