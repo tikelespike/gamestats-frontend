@@ -217,9 +217,7 @@ const CharacterManager = () => {
     .map(character => (
       <CharacterCard
         key={character.id}
-        name={character.name}
-        type={character.type}
-        icon={character.imageUrl}
+        character={character}
         onClick={() => handleOpenEditModal(character.id)}
       />
     ))

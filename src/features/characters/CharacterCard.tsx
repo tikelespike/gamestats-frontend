@@ -1,21 +1,14 @@
 import React from "react"
 import { Avatar, Paper, Text } from "@mantine/core"
 import styles from "./CharacterCard.module.css"
-import type { CharacterType } from "../api/apiSlice"
+import type { Character } from "../api/apiSlice"
 
 interface CharacterCardProps {
-  name: string
-  type: CharacterType
-  icon: string | null
+  character: Character
   onClick: () => void
 }
 
-export function CharacterCard({
-  name,
-  type,
-  icon,
-  onClick,
-}: CharacterCardProps) {
+export function CharacterCard({ character, onClick }: CharacterCardProps) {
   return (
     <Paper
       withBorder
@@ -27,11 +20,11 @@ export function CharacterCard({
       tabIndex={0}
       onKeyDown={e => e.key === "Enter" && onClick()}
     >
-      <Avatar size={50} src={icon} radius={50} my="xs" />
+      <Avatar size={50} src={character.imageUrl} radius={50} my="xs" />
       <div className={styles.textContainer}>
-        <Text fz="md">{name}</Text>
+        <Text fz="md">{character.name}</Text>
         <Text c="dimmed" fz="sm">
-          {titleCase(type.toString())}
+          {titleCase(character.type.toString())}
         </Text>
       </div>
     </Paper>
