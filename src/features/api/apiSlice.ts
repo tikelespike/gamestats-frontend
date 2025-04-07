@@ -48,6 +48,15 @@ export interface AddCharacterRequest {
   imageUrl: string | null
 }
 
+export interface Script {
+  id: number
+  version: number
+  name: string
+  description: string | null
+  wikiPageLink: string | null
+  characterIds: number[]
+}
+
 export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL as string,

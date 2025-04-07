@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import { setToken } from "./features/auth/authSlice"
 import { jwtDecode } from "jwt-decode"
 import { useAppDispatch } from "./app/hooks"
+import ScriptManager from "./features/scripts/ScriptManager"
 
 const App = () => {
   const dispatch = useAppDispatch()
@@ -45,6 +46,7 @@ const App = () => {
         <Route element={<PrivateOutlet />}>
           <Route element={<MainLayout />}>
             <Route path="/manager/games" element={<GameManager />} />
+            <Route path="/manager/scripts" element={<ScriptManager />} />
             <Route path="/manager/characters" element={<CharacterManager />} />
             <Route path="/manager/players" element={<PlayerManager />} />
           </Route>
