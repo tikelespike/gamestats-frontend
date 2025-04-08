@@ -16,7 +16,7 @@ const ScriptManager = () => {
     modals.open({
       title: "Add Script",
       centered: true,
-      size: "md",
+      size: "lg",
       fullScreen: isSmallScreen,
       children: <AddScriptModal />,
     })
