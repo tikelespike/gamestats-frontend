@@ -1,10 +1,6 @@
 import { useForm } from "@mantine/form"
-import {
-  AddScriptRequest,
-  Character,
-  CharacterType,
-  useCharactersQuery,
-} from "../api/apiSlice"
+import type { AddScriptRequest, Character } from "../api/apiSlice"
+import { CharacterType, useCharactersQuery } from "../api/apiSlice"
 import { modals } from "@mantine/modals"
 import {
   ActionIcon,
