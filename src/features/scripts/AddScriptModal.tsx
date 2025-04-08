@@ -84,10 +84,16 @@ const AddScriptModal = () => {
     }))
   }
 
-  const characterOptions = characters.map(character => ({
-    value: character.id.toString(),
-    label: character.name,
-  }))
+  const characterOptions = characters
+    .filter(
+      character =>
+        !form.values.characterIds.includes(character.id) &&
+        character.type !== CharacterType.Traveller, // Travellers play a special role and should not be included in scripts
+    )
+    .map(character => ({
+      value: character.id.toString(),
+      label: character.name,
+    }))
 
   const charactersByType = selectedCharacters.reduce<
     Record<CharacterType, Character[]>
