@@ -9,7 +9,6 @@
     padding: var(--mantine-spacing-md);
     transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
     cursor: pointer;
-    border-style: dashed;
 }
 
 .card:hover {
@@ -18,7 +17,6 @@
 
 .card:active {
     transform: scale(0.98);
-    box-shadow: var(--mantine-shadow-sm);
 }
 
 .textContainer {

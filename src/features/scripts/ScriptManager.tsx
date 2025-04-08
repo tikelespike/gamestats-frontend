@@ -3,6 +3,7 @@ import { ScriptCard } from "./ScriptCard"
 import { Center, Loader, Stack } from "@mantine/core"
 import { useScriptsQuery } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
+import AddScriptCard from "./AddScriptCard"
 
 const ScriptManager = () => {
   const { data: scripts, isLoading, error } = useScriptsQuery()
@@ -37,9 +38,14 @@ const ScriptManager = () => {
   ))
 
   return (
-    <Center mt={"xl"}>
-      <Stack gap={"lg"}>{scriptCards}</Stack>
-    </Center>
+    <>
+      <Center>
+        <Stack mt={"lg"} gap={"lg"}>
+          <AddScriptCard />
+          {scriptCards}
+        </Stack>
+      </Center>
+    </>
   )
 }
 
