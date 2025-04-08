@@ -57,6 +57,13 @@ export interface Script {
   characterIds: number[]
 }
 
+export interface AddScriptRequest {
+  name: string
+  description: string | null
+  wikiPageLink: string | null
+  characterIds: number[]
+}
+
 export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL as string,
