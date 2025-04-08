@@ -1,10 +1,9 @@
 import { useForm } from "@mantine/form"
-import type { AddScriptRequest } from "../api/apiSlice"
+import type { AddScriptRequest, Character } from "../api/apiSlice"
 import { useCharactersQuery } from "../api/apiSlice"
 import { modals } from "@mantine/modals"
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Grid,
@@ -14,8 +13,9 @@ import {
   Textarea,
   TextInput,
 } from "@mantine/core"
-import { IconPlus, IconX } from "@tabler/icons-react"
+import { IconPlus } from "@tabler/icons-react"
 import { useState } from "react"
+import CharacterItem from "./CharacterItem"
 
 const AddScriptModal = () => {
   const { data: characters = [] } = useCharactersQuery()
@@ -124,24 +124,11 @@ const AddScriptModal = () => {
               </Text>
               <Group gap="xs">
                 {selectedCharacters.map(character => (
-                  <Badge
+                  <CharacterItem
                     key={character.id}
-                    size="lg"
-                    radius="sm"
-                    variant="filled"
-                    rightSection={
-                      <ActionIcon
-                        size="xs"
-                        variant="transparent"
-                        color="white"
-                        onClick={() => handleRemoveCharacter(character.id)}
-                      >
-                        <IconX size={12} />
-                      </ActionIcon>
-                    }
-                  >
-                    {character.name}
-                  </Badge>
+                    character={character}
+                    onRemove={handleRemoveCharacter}
+                  />
                 ))}
               </Group>
             </Box>
