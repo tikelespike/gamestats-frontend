@@ -97,6 +97,7 @@ const AddScriptModal = () => {
         acc[character.type] = []
       }
       acc[character.type].push(character)
+      acc[character.type].sort((a, b) => a.name.localeCompare(b.name))
       return acc
     },
     {} as Record<CharacterType, Character[]>,
