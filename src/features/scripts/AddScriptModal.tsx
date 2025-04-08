@@ -1,17 +1,65 @@
 import { useForm } from "@mantine/form"
-import type { AddScriptRequest } from "../api/apiSlice"
+import type { AddScriptRequest, Character } from "../api/apiSlice"
+import { useCharactersQuery } from "../api/apiSlice"
 import { modals } from "@mantine/modals"
-import { Button, Grid, Group, Textarea, TextInput } from "@mantine/core"
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Grid,
+  Group,
+  Select,
+  Text,
+  Textarea,
+  TextInput,
+} from "@mantine/core"
+import { IconPlus, IconX } from "@tabler/icons-react"
+import { useState } from "react"
 
 const AddScriptModal = () => {
+  const { data: characters = [] } = useCharactersQuery()
+  const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([])
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
+    null,
+  )
+
   const form = useForm<AddScriptRequest>({
     initialValues: {
       name: "",
-      description: "",
-      wikiPageLink: "",
+      description: null,
+      wikiPageLink: null,
       characterIds: [],
     },
   })
+
+  const handleAddCharacter = () => {
+    if (selectedCharacterId) {
+      const characterId = parseInt(selectedCharacterId)
+      const character = characters.find(c => c.id === characterId)
+      if (character && !selectedCharacters.some(c => c.id === characterId)) {
+        setSelectedCharacters([...selectedCharacters, character])
+        form.setFieldValue("characterIds", [
+          ...form.values.characterIds,
+          characterId,
+        ])
+        setSelectedCharacterId(null)
+      }
+    }
+  }
+
+  const handleRemoveCharacter = (characterId: number) => {
+    setSelectedCharacters(selectedCharacters.filter(c => c.id !== characterId))
+    form.setFieldValue(
+      "characterIds",
+      form.values.characterIds.filter(id => id !== characterId),
+    )
+  }
+
+  const characterOptions = characters.map(character => ({
+    value: character.id.toString(),
+    label: character.name,
+  }))
 
   return (
     <form
@@ -44,6 +92,58 @@ const AddScriptModal = () => {
             placeholder="https://wiki.bloodontheclocktower.com/Trouble_Brewing"
             {...form.getInputProps("wikiPageLink")}
           />
+        </Grid.Col>
+        <Grid.Col>
+          <Group align="flex-end">
+            <Select
+              label="Add Character"
+              placeholder="Select a character"
+              data={characterOptions}
+              value={selectedCharacterId}
+              onChange={setSelectedCharacterId}
+              style={{ flex: 1 }}
+            />
+            <ActionIcon
+              variant="filled"
+              color="blue"
+              size="lg"
+              onClick={handleAddCharacter}
+              disabled={!selectedCharacterId}
+            >
+              <IconPlus size={16} />
+            </ActionIcon>
+          </Group>
+        </Grid.Col>
+        <Grid.Col>
+          {selectedCharacters.length > 0 && (
+            <Box mt="md">
+              <Text size="sm" fw={500} mb="xs">
+                Selected Characters:
+              </Text>
+              <Group gap="xs">
+                {selectedCharacters.map(character => (
+                  <Badge
+                    key={character.id}
+                    size="lg"
+                    radius="sm"
+                    variant="filled"
+                    rightSection={
+                      <ActionIcon
+                        size="xs"
+                        variant="transparent"
+                        color="white"
+                        onClick={() => handleRemoveCharacter(character.id)}
+                      >
+                        <IconX size={12} />
+                      </ActionIcon>
+                    }
+                  >
+                    {character.name}
+                  </Badge>
+                ))}
+              </Group>
+            </Box>
+          )}
         </Grid.Col>
       </Grid>
 
