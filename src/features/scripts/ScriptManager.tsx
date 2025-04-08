@@ -81,25 +81,14 @@ const ScriptManager = () => {
 
   if (isLoading) {
     return (
-      <Center mt="xl">
-        <Loader />
+      <Center>
+        <Loader top="40vh" color="blue" size="xl" type="bars" />
       </Center>
     )
   }
 
   if (error) {
     return <ErrorDisplay error={error} />
-  }
-
-  if (scripts.length === 0) {
-    return (
-      <Center mt="xl">
-        <Stack gap="lg">
-          <AddScriptCard onClick={handleOpenAddModal} />
-          <div>No scripts found</div>
-        </Stack>
-      </Center>
-    )
   }
 
   const scriptCards = scripts.map(script => (
