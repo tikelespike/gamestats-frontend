@@ -1,5 +1,6 @@
 import React from "react"
 import CharacterCard from "./CharacterCard"
+import type { MantineTheme } from "@mantine/core"
 import {
   ActionIcon,
   Autocomplete,
@@ -9,7 +10,6 @@ import {
   Grid,
   Group,
   Loader,
-  MantineTheme,
   Modal,
   SegmentedControl,
   Select,
@@ -244,7 +244,6 @@ const CharacterManager = () => {
     })
   }
 
-  // @ts-ignore
   return (
     <>
       <Modal.Stack>
