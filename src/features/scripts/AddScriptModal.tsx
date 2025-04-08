@@ -101,6 +101,8 @@ const AddScriptModal = () => {
               data={characterOptions}
               value={selectedCharacterId}
               onChange={setSelectedCharacterId}
+              searchable
+              clearable
               style={{ flex: 1 }}
             />
             <ActionIcon
