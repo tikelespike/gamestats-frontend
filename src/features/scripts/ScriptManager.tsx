@@ -1,73 +1,11 @@
-import type { AddScriptRequest } from "../api/apiSlice"
 import { useScriptsQuery } from "../api/apiSlice"
-import {
-  Button,
-  Center,
-  Grid,
-  Group,
-  Loader,
-  Stack,
-  Textarea,
-  TextInput,
-  useMantineTheme,
-} from "@mantine/core"
+import { Center, Loader, Stack, useMantineTheme } from "@mantine/core"
 import { modals } from "@mantine/modals"
-import { useForm } from "@mantine/form"
 import ErrorDisplay from "../../components/ErrorDisplay"
 import AddScriptCard from "./AddScriptCard"
 import { ScriptCard } from "./ScriptCard"
 import { useMediaQuery } from "@mantine/hooks"
-
-const AddScriptModal = () => {
-  const form = useForm<AddScriptRequest>({
-    initialValues: {
-      name: "",
-      description: "",
-      wikiPageLink: "",
-      characterIds: [],
-    },
-  })
-
-  return (
-    <form
-      onSubmit={form.onSubmit(values => {
-        // TODO: Implement script creation
-        console.log("Creating script:", values)
-        modals.closeAll()
-      })}
-    >
-      <Grid gutter="lg">
-        <Grid.Col>
-          <TextInput
-            label="Script Name"
-            placeholder="Trouble Brewing"
-            withAsterisk
-            {...form.getInputProps("name")}
-          />
-        </Grid.Col>
-        <Grid.Col>
-          <Textarea
-            label="Description"
-            placeholder="An easy script suitable for beginners."
-            minRows={3}
-            {...form.getInputProps("description")}
-          />
-        </Grid.Col>
-        <Grid.Col>
-          <TextInput
-            label="Wiki Page URL"
-            placeholder="https://wiki.bloodontheclocktower.com/Trouble_Brewing"
-            {...form.getInputProps("wikiPageLink")}
-          />
-        </Grid.Col>
-      </Grid>
-
-      <Group mt="xl" justify="flex-end">
-        <Button type="submit">Create</Button>
-      </Group>
-    </form>
-  )
-}
+import AddScriptModal from "./AddScriptModal"
 
 const ScriptManager = () => {
   const theme = useMantineTheme()
