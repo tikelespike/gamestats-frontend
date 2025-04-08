@@ -1,5 +1,5 @@
 import { useForm } from "@mantine/form"
-import type { AddScriptRequest, Character } from "../api/apiSlice"
+import type { AddScriptRequest } from "../api/apiSlice"
 import { useCharactersQuery } from "../api/apiSlice"
 import { modals } from "@mantine/modals"
 import {
@@ -19,7 +19,6 @@ import { useState } from "react"
 
 const AddScriptModal = () => {
   const { data: characters = [] } = useCharactersQuery()
-  const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([])
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
     null,
   )
@@ -33,12 +32,14 @@ const AddScriptModal = () => {
     },
   })
 
+  const selectedCharacters = characters.filter(character =>
+    form.values.characterIds.includes(character.id),
+  )
+
   const handleAddCharacter = () => {
     if (selectedCharacterId) {
       const characterId = parseInt(selectedCharacterId)
-      const character = characters.find(c => c.id === characterId)
-      if (character && !selectedCharacters.some(c => c.id === characterId)) {
-        setSelectedCharacters([...selectedCharacters, character])
+      if (!form.values.characterIds.includes(characterId)) {
         form.setFieldValue("characterIds", [
           ...form.values.characterIds,
           characterId,
@@ -49,7 +50,6 @@ const AddScriptModal = () => {
   }
 
   const handleRemoveCharacter = (characterId: number) => {
-    setSelectedCharacters(selectedCharacters.filter(c => c.id !== characterId))
     form.setFieldValue(
       "characterIds",
       form.values.characterIds.filter(id => id !== characterId),
