@@ -1,13 +1,6 @@
+import type { Script } from "../api/apiSlice"
 import { useScriptsQuery } from "../api/apiSlice"
-import {
-  Button,
-  Center,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  useMantineTheme,
-} from "@mantine/core"
+import { Center, Loader, Stack, useMantineTheme } from "@mantine/core"
 import { modals } from "@mantine/modals"
 import ErrorDisplay from "../../components/ErrorDisplay"
 import AddScriptCard from "./AddScriptCard"
@@ -15,7 +8,7 @@ import { ScriptCard } from "./ScriptCard"
 import { useMediaQuery } from "@mantine/hooks"
 import AddScriptModal from "./AddScriptModal"
 import DeleteScriptModal from "./DeleteScriptModal"
-import { notifications } from "@mantine/notifications"
+import EditScriptModal from "./EditScriptModal"
 
 const ScriptManager = () => {
   const theme = useMantineTheme()
@@ -36,7 +29,22 @@ const ScriptManager = () => {
     const modalId = modals.open({
       title: "Delete Script",
       centered: true,
-      children: <DeleteScriptModal scriptId={scriptId} onClose={() => modals.close(modalId)} />,
+      children: (
+        <DeleteScriptModal
+          scriptId={scriptId}
+          onClose={() => modals.close(modalId)}
+        />
+      ),
+    })
+  }
+
+  const handleEditScript = (script: Script) => {
+    modals.open({
+      title: "Edit Script",
+      centered: true,
+      size: "lg",
+      fullScreen: isSmallScreen,
+      children: <EditScriptModal script={script} />,
     })
   }
 
@@ -57,7 +65,7 @@ const ScriptManager = () => {
       key={script.id}
       script={script}
       onDelete={() => handleDeleteScript(script.id)}
-      onEdit={() => {}}
+      onEdit={() => handleEditScript(script)}
     />
   ))
 
