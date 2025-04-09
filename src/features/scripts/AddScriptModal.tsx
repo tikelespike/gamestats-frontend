@@ -32,7 +32,8 @@ import { notifications } from "@mantine/notifications"
 
 const AddScriptModal = () => {
   const { data: characters = [] } = useCharactersQuery()
-  const [addScript, { isLoading }] = useAddScriptMutation()
+  const [addScript] = useAddScriptMutation()
+  const [isLoading, setLoading] = useState<boolean>(false)
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
     null,
   )
@@ -128,6 +129,7 @@ const AddScriptModal = () => {
   }
 
   const handleSubmit = async (values: AddScriptRequest) => {
+    setLoading(true)
     try {
       await addScript(values).unwrap()
       notifications.show({
@@ -146,6 +148,7 @@ const AddScriptModal = () => {
         autoClose: false,
         position: "top-center",
       })
+      setLoading(false)
     }
   }
 
