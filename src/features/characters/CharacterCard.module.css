@@ -22,6 +22,11 @@
     box-shadow: var(--mantine-shadow-sm);
 }
 
+.characterCard.selected {
+    border-color: var(--mantine-color-blue-6);
+    background-color: var(--mantine-color-blue-0);
+}
+
 .textContainer {
     display: flex;
     flex-direction: column;

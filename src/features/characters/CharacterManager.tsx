@@ -22,24 +22,30 @@ import type { AddCharacterRequest, Character } from "../api/apiSlice"
 import {
   CharacterType,
   useAddCharacterMutation,
+  useBatchDeleteCharactersMutation,
   useCharactersQuery,
   useDeleteCharacterMutation,
   useEditCharacterMutation,
   useOfficialCharactersQuery,
 } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
-import AddCharacterCard from "./AddCharacterCard"
-import styles from "./CharacterManager.module.css"
 import { useMediaQuery } from "@mantine/hooks"
 import { useForm } from "@mantine/form"
 import { IconExternalLink, IconWand } from "@tabler/icons-react"
 import { notifications } from "@mantine/notifications"
 import { modals } from "@mantine/modals"
+import styles from "./CharacterManager.module.css"
+import AddCharacterCard from "./AddCharacterCard"
 
 const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
   const [mutationLoading, setMutationLoading] = React.useState<boolean>(false)
   const [deleteLoading, setDeleteLoading] = React.useState<boolean>(false)
+  const [isMultiSelectMode, setIsMultiSelectMode] =
+    React.useState<boolean>(false)
+  const [selectedCharacterIds, setSelectedCharacterIds] = React.useState<
+    number[]
+  >([])
   const operationLoading = mutationLoading || deleteLoading
   const getCharactersState = useCharactersQuery()
   const getOfficialCharactersState = useOfficialCharactersQuery()
@@ -116,6 +122,7 @@ const CharacterManager = () => {
   const [addCharacter] = useAddCharacterMutation()
   const [editCharacter] = useEditCharacterMutation()
   const [deleteCharacter] = useDeleteCharacterMutation()
+  const [batchDeleteCharacters] = useBatchDeleteCharactersMutation()
 
   const handleAddCharacter = async (values: AddCharacterRequest) => {
     setMutationLoading(true)
@@ -201,6 +208,63 @@ const CharacterManager = () => {
     })
   }
 
+  const handleToggleMultiSelectMode = () => {
+    setIsMultiSelectMode(!isMultiSelectMode)
+    setSelectedCharacterIds([])
+  }
+
+  const handleToggleCharacterSelection = (id: number) => {
+    setSelectedCharacterIds(prev =>
+      prev.includes(id)
+        ? prev.filter(characterId => characterId !== id)
+        : [...prev, id],
+    )
+  }
+
+  const handleBatchDelete = async () => {
+    if (selectedCharacterIds.length === 0) return
+
+    modals.openConfirmModal({
+      id: "confirm-batch-delete",
+      title: "Delete Selected Characters",
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete {selectedCharacterIds.length} selected
+          characters? This action cannot be undone. All games using these
+          characters will be affected.
+        </Text>
+      ),
+      labels: {
+        confirm: "Delete Characters",
+        cancel: "Cancel",
+      },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        setDeleteLoading(true)
+        console.log("Deleting characters: ", selectedCharacterIds)
+        try {
+          await batchDeleteCharacters(selectedCharacterIds).unwrap()
+          setIsMultiSelectMode(false)
+          setSelectedCharacterIds([])
+        } catch (err) {
+          console.error("Batch delete failed: ", err)
+          notifications.show({
+            title: "Delete failed",
+            message:
+              // @ts-ignore
+              "Characters could not be deleted (error code " + err.status + ")",
+            color: "red",
+            autoClose: false,
+            position: "top-center",
+          })
+        }
+        setDeleteLoading(false)
+      },
+      zIndex: 1000,
+    })
+  }
+
   if (getCharactersState.isLoading) {
     return (
       <Center>
@@ -218,7 +282,13 @@ const CharacterManager = () => {
       <CharacterCard
         key={character.id}
         character={character}
-        onClick={() => handleOpenEditModal(character.id)}
+        onClick={() =>
+          isMultiSelectMode
+            ? handleToggleCharacterSelection(character.id)
+            : handleOpenEditModal(character.id)
+        }
+        isSelected={selectedCharacterIds.includes(character.id)}
+        isMultiSelectMode={isMultiSelectMode}
       />
     ))
 
@@ -462,9 +532,32 @@ const CharacterManager = () => {
         </Modal>
       </Modal.Stack>
 
-      <Box className={styles.container}>
-        <AddCharacterCard onClick={handleOpenAddModal} />
-        {characterCards}
+      <Box>
+        <Group justify="space-between" mb="md">
+          <Group>
+            <Button
+              variant={isMultiSelectMode ? "filled" : "light"}
+              color={isMultiSelectMode ? "blue" : "gray"}
+              onClick={handleToggleMultiSelectMode}
+            >
+              {isMultiSelectMode ? "Exit Multi-Select" : "Multi-Select"}
+            </Button>
+            {isMultiSelectMode && (
+              <Button
+                color="red"
+                disabled={selectedCharacterIds.length === 0}
+                onClick={handleBatchDelete}
+                loading={deleteLoading}
+              >
+                Delete Selected ({selectedCharacterIds.length})
+              </Button>
+            )}
+          </Group>
+        </Group>
+        <Box className={styles.container}>
+          <AddCharacterCard onClick={handleOpenAddModal} />
+          {characterCards}
+        </Box>
       </Box>
     </>
   )

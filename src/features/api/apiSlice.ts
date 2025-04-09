@@ -132,6 +132,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Characters", "Scripts"], // Deleting a character will remove it from any scripts it was in
     }),
+    batchDeleteCharacters: builder.mutation<void, number[]>({
+      query: ids => ({
+        url: `/characters/batch`,
+        method: "DELETE",
+        body: ids,
+      }),
+      invalidatesTags: ["Characters", "Scripts"],
+    }),
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
     }),
@@ -174,6 +182,7 @@ export const {
   useAddCharacterMutation,
   useEditCharacterMutation,
   useDeleteCharacterMutation,
+  useBatchDeleteCharactersMutation,
   useOfficialCharactersQuery,
   useScriptsQuery,
   useAddScriptMutation,
