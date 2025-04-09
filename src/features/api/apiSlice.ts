@@ -130,7 +130,7 @@ export const apiSlice = createApi({
         url: `/characters/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Characters"],
+      invalidatesTags: ["Characters", "Scripts"], // Deleting a character will remove it from any scripts it was in
     }),
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
