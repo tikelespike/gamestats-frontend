@@ -147,6 +147,13 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Scripts"],
     }),
+    deleteScript: builder.mutation<void, number>({
+      query: id => ({
+        url: `/scripts/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Scripts"],
+    }),
   }),
 })
 
@@ -162,4 +169,5 @@ export const {
   useOfficialCharactersQuery,
   useScriptsQuery,
   useAddScriptMutation,
+  useDeleteScriptMutation,
 } = apiSlice
