@@ -1,6 +1,10 @@
 import { useForm } from "@mantine/form"
 import type { AddScriptRequest, Character } from "../api/apiSlice"
-import { CharacterType, useCharactersQuery } from "../api/apiSlice"
+import {
+  CharacterType,
+  useAddScriptMutation,
+  useCharactersQuery,
+} from "../api/apiSlice"
 import { modals } from "@mantine/modals"
 import {
   ActionIcon,
@@ -24,9 +28,11 @@ import {
 } from "@tabler/icons-react"
 import { useState } from "react"
 import CharacterItem from "./CharacterItem"
+import { notifications } from "@mantine/notifications"
 
 const AddScriptModal = () => {
   const { data: characters = [] } = useCharactersQuery()
+  const [addScript, { isLoading }] = useAddScriptMutation()
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
     null,
   )
@@ -46,6 +52,10 @@ const AddScriptModal = () => {
       description: null,
       wikiPageLink: null,
       characterIds: [],
+    },
+    validate: {
+      name: value =>
+        value.trim().length > 0 ? null : "Script name is required",
     },
   })
 
@@ -117,20 +127,37 @@ const AddScriptModal = () => {
     return type.charAt(0).toUpperCase() + type.slice(1)
   }
 
+  const handleSubmit = async (values: AddScriptRequest) => {
+    try {
+      await addScript(values).unwrap()
+      notifications.show({
+        title: "Success",
+        message: "Script created successfully",
+        color: "green",
+      })
+      modals.closeAll()
+    } catch (error) {
+      notifications.show({
+        title: "Creation failed",
+        message:
+          // @ts-ignore
+          "Script could not be created (error code " + error.status + ")",
+        color: "red",
+        autoClose: false,
+        position: "top-center",
+      })
+    }
+  }
+
   return (
-    <form
-      onSubmit={form.onSubmit(values => {
-        // TODO: Implement script creation
-        console.log("Creating script:", values)
-        modals.closeAll()
-      })}
-    >
+    <form onSubmit={form.onSubmit(handleSubmit)}>
       <Grid gutter="lg">
         <Grid.Col>
           <TextInput
             label="Script Name"
             placeholder="Trouble Brewing"
             withAsterisk
+            disabled={isLoading}
             {...form.getInputProps("name")}
           />
         </Grid.Col>
@@ -139,6 +166,7 @@ const AddScriptModal = () => {
             label="Description"
             placeholder="An easy script suitable for beginners."
             minRows={3}
+            disabled={isLoading}
             {...form.getInputProps("description")}
           />
         </Grid.Col>
@@ -146,6 +174,7 @@ const AddScriptModal = () => {
           <TextInput
             label="Wiki Page URL"
             placeholder="https://wiki.bloodontheclocktower.com/Trouble_Brewing"
+            disabled={isLoading}
             {...form.getInputProps("wikiPageLink")}
           />
         </Grid.Col>
@@ -159,6 +188,7 @@ const AddScriptModal = () => {
               onChange={setSelectedCharacterId}
               searchable
               clearable
+              disabled={isLoading}
               style={{ flex: 1 }}
             />
             <ActionIcon
@@ -166,7 +196,7 @@ const AddScriptModal = () => {
               color="blue"
               size="lg"
               onClick={handleAddCharacter}
-              disabled={!selectedCharacterId}
+              disabled={!selectedCharacterId || isLoading}
             >
               <IconPlus size={16} />
             </ActionIcon>
@@ -188,6 +218,7 @@ const AddScriptModal = () => {
                       <UnstyledButton
                         onClick={() => toggleTypeExpanded(type)}
                         style={{ width: "100%" }}
+                        disabled={isLoading}
                       >
                         <Group justify="space-between" wrap="nowrap">
                           <Title order={6}>
@@ -208,6 +239,7 @@ const AddScriptModal = () => {
                               key={character.id}
                               character={character}
                               onRemove={handleRemoveCharacter}
+                              disabled={isLoading}
                             />
                           ))}
                         </Group>
@@ -223,7 +255,9 @@ const AddScriptModal = () => {
       </Grid>
 
       <Group mt="xl" justify="flex-end">
-        <Button type="submit">Create</Button>
+        <Button type="submit" loading={isLoading}>
+          Create
+        </Button>
       </Group>
     </form>
   )
