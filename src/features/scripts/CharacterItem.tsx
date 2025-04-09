@@ -12,9 +12,14 @@ import type { Character } from "../api/apiSlice"
 interface CharacterItemProps {
   character: Character
   onRemove?: (characterId: number) => void
+  disabled?: boolean
 }
 
-const CharacterItem = ({ character, onRemove }: CharacterItemProps) => {
+const CharacterItem = ({
+  character,
+  onRemove,
+  disabled,
+}: CharacterItemProps) => {
   const { colorScheme } = useMantineColorScheme()
 
   return (
@@ -39,6 +44,7 @@ const CharacterItem = ({ character, onRemove }: CharacterItemProps) => {
             variant="transparent"
             color="gray"
             onClick={() => onRemove(character.id)}
+            disabled={disabled}
           >
             <IconX size={12} />
           </ActionIcon>
