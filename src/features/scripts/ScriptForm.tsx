@@ -149,6 +149,7 @@ const ScriptForm = ({
             label="Description"
             placeholder="An easy script suitable for beginners."
             minRows={3}
+            autosize
             disabled={isSubmitting}
             {...form.getInputProps("description")}
           />
