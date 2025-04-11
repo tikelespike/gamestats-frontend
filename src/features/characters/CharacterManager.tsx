@@ -11,6 +11,7 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core"
+import type { AddCharacterRequest } from "../api/apiSlice"
 import { useCharactersQuery, useOfficialCharactersQuery } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
 import { useMediaQuery } from "@mantine/hooks"
@@ -116,16 +117,16 @@ const CharacterManager = () => {
     })
   }
 
-  const getMissingOfficialCharacters = () => {
-    if (!getCharactersState.data || !getOfficialCharactersState.data) return []
+  let missingOfficialCharacters: AddCharacterRequest[] = []
+  if (getCharactersState.data && getOfficialCharactersState.data) {
     const existingNames = new Set(getCharactersState.data.map(c => c.name))
-    return getOfficialCharactersState.data.filter(
+    missingOfficialCharacters = getOfficialCharactersState.data.filter(
       character => !existingNames.has(character.name),
     )
   }
 
   const handleBatchAddCharacters = () => {
-    const missingCharacters = getMissingOfficialCharacters()
+    const missingCharacters = missingOfficialCharacters
     if (missingCharacters.length === 0) return
 
     const modalId = modals.open({
@@ -162,7 +163,7 @@ const CharacterManager = () => {
           <Button
             size="lg"
             onClick={handleBatchAddCharacters}
-            disabled={getMissingOfficialCharacters().length === 0}
+            disabled={missingOfficialCharacters.length === 0}
           >
             Import all official characters
           </Button>
@@ -200,11 +201,11 @@ const CharacterManager = () => {
       <Group justify="space-between" mb="md">
         <Group>
           <Button
-            variant={isMultiSelectMode ? "filled" : "light"}
-            color={isMultiSelectMode ? "blue" : "gray"}
+            variant={isMultiSelectMode ? "light" : "filled"}
+            color={isMultiSelectMode ? "gray" : "blue"}
             onClick={handleToggleMultiSelectMode}
           >
-            {isMultiSelectMode ? "Exit Multi-Select" : "Multi-Select"}
+            {isMultiSelectMode ? "Cancel" : "Select characters"}
           </Button>
           {isMultiSelectMode ? (
             <>
@@ -216,17 +217,17 @@ const CharacterManager = () => {
                 disabled={selectedCharacterIds.length === 0}
                 onClick={handleBatchDelete}
               >
-                Delete Selected ({selectedCharacterIds.length})
+                Delete selected ({selectedCharacterIds.length})
               </Button>
             </>
           ) : (
             <Button
-              variant="light"
-              color="blue"
+              variant="gradient"
               onClick={handleBatchAddCharacters}
-              disabled={getMissingOfficialCharacters().length === 0}
+              disabled={missingOfficialCharacters.length === 0}
             >
-              Add Missing Official Characters
+              Import {missingOfficialCharacters.length} new character
+              {missingOfficialCharacters.length > 1 ? "s" : ""}
             </Button>
           )}
         </Group>
