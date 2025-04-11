@@ -174,8 +174,7 @@ export function EditCharacterModal({
               fullWidth
               variant={"outline"}
               color={"red"}
-              disabled={isSubmitting}
-              loading={isDeleting}
+              disabled={isSubmitting || isDeleting}
               onClick={() => setShowDeleteConfirm(true)}
             >
               Delete

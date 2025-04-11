@@ -159,16 +159,20 @@ const CharacterManager = () => {
           <Text size="lg" ta="center" mb={"xl"}>
             Looks a bit empty here, huh? To get started:
           </Text>
-          <Button size="lg" onClick={handleOpenAddModal}>
-            Create your first character
-          </Button>
-          <Text>or</Text>
           <Button
             size="lg"
             onClick={handleBatchAddCharacters}
             disabled={getMissingOfficialCharacters().length === 0}
           >
-            Import the official characters
+            Import all official characters
+          </Button>
+          <Text>or</Text>
+          <Button
+            size="lg"
+            variant={"transparent"}
+            onClick={handleOpenAddModal}
+          >
+            Create a character manually
           </Button>
         </Stack>
       </Center>
