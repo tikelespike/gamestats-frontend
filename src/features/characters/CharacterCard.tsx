@@ -1,5 +1,5 @@
 import React from "react"
-import { Avatar, Paper, Text, Checkbox } from "@mantine/core"
+import { Avatar, Checkbox, Paper, Text } from "@mantine/core"
 import styles from "./CharacterCard.module.css"
 import type { Character } from "../api/apiSlice"
 
@@ -10,18 +10,18 @@ interface CharacterCardProps {
   isMultiSelectMode?: boolean
 }
 
-export function CharacterCard({ 
-  character, 
-  onClick, 
+export function CharacterCard({
+  character,
+  onClick,
   isSelected = false,
-  isMultiSelectMode = false 
+  isMultiSelectMode = false,
 }: CharacterCardProps) {
   return (
     <Paper
       withBorder
       shadow="sm"
       display="flex"
-      className={`${styles.characterCard} ${isSelected ? styles.selected : ''}`}
+      className={`${styles.characterCard} ${isSelected ? styles.selected : ""}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -33,7 +33,6 @@ export function CharacterCard({
           onChange={() => {}}
           onClick={e => e.stopPropagation()}
           size="sm"
-          mr="xs"
         />
       )}
       <Avatar size={50} src={character.imageUrl} radius={50} my="xs" />
