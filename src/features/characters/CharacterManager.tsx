@@ -210,7 +210,7 @@ const CharacterManager = () => {
           {isMultiSelectMode ? (
             <>
               <Button variant="light" color="blue" onClick={handleSelectAll}>
-                Select All
+                Select all
               </Button>
               <Button
                 color="red"
