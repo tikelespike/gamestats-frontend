@@ -7,6 +7,8 @@ import {
   Center,
   Group,
   Loader,
+  Stack,
+  Text,
   useMantineTheme,
 } from "@mantine/core"
 import { useCharactersQuery, useOfficialCharactersQuery } from "../api/apiSlice"
@@ -148,6 +150,29 @@ const CharacterManager = () => {
   }
   if (getCharactersState.isError || getCharactersState.data === undefined) {
     return <ErrorDisplay error={getCharactersState.error} />
+  }
+
+  if (getCharactersState.data.length === 0) {
+    return (
+      <Center>
+        <Stack align="center" gap="md" mt={"xl"}>
+          <Text size="lg" ta="center" mb={"xl"}>
+            Looks a bit empty here, huh? To get started:
+          </Text>
+          <Button size="lg" onClick={handleOpenAddModal}>
+            Create your first character
+          </Button>
+          <Text>or</Text>
+          <Button
+            size="lg"
+            onClick={handleBatchAddCharacters}
+            disabled={getMissingOfficialCharacters().length === 0}
+          >
+            Import the official characters
+          </Button>
+        </Stack>
+      </Center>
+    )
   }
 
   const characterCards = getCharactersState.data
