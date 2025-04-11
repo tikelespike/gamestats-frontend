@@ -102,6 +102,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
       withBorder
       maw={900}
       className={styles.scriptCard}
+      onClick={() => onEdit?.(script)}
     >
       <Stack gap="xs">
         <Group justify="space-between" align="flex-start">
