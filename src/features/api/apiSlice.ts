@@ -117,6 +117,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Characters"],
     }),
+    batchAddCharacters: builder.mutation<Character[], AddCharacterRequest[]>({
+      query: requests => ({
+        url: "/characters/batch",
+        method: "POST",
+        body: requests,
+      }),
+      invalidatesTags: ["Characters"],
+    }),
     editCharacter: builder.mutation<Character, Character>({
       query: request => ({
         url: `/characters/${request.id}`,
@@ -180,6 +188,7 @@ export const {
   useDeletePlayerMutation,
   useCharactersQuery,
   useAddCharacterMutation,
+  useBatchAddCharactersMutation,
   useEditCharacterMutation,
   useDeleteCharacterMutation,
   useBatchDeleteCharactersMutation,

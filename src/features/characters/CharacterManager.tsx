@@ -22,6 +22,7 @@ import type { AddCharacterRequest, Character } from "../api/apiSlice"
 import {
   CharacterType,
   useAddCharacterMutation,
+  useBatchAddCharactersMutation,
   useBatchDeleteCharactersMutation,
   useCharactersQuery,
   useDeleteCharacterMutation,
@@ -36,6 +37,7 @@ import { notifications } from "@mantine/notifications"
 import { modals } from "@mantine/modals"
 import styles from "./CharacterManager.module.css"
 import AddCharacterCard from "./AddCharacterCard"
+import { titleCase } from "../../utils/utils"
 
 const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
@@ -123,6 +125,7 @@ const CharacterManager = () => {
   const [editCharacter] = useEditCharacterMutation()
   const [deleteCharacter] = useDeleteCharacterMutation()
   const [batchDeleteCharacters] = useBatchDeleteCharactersMutation()
+  const [batchAddCharacters] = useBatchAddCharactersMutation()
 
   const handleAddCharacter = async (values: AddCharacterRequest) => {
     setMutationLoading(true)
@@ -215,7 +218,9 @@ const CharacterManager = () => {
 
   const handleSelectAll = () => {
     if (getCharactersState.data === undefined) return
-    setSelectedCharacterIds(getCharactersState.data.map(character => character.id))
+    setSelectedCharacterIds(
+      getCharactersState.data.map(character => character.id),
+    )
   }
 
   const handleToggleCharacterSelection = (id: number) => {
@@ -265,6 +270,70 @@ const CharacterManager = () => {
           })
         }
         setDeleteLoading(false)
+      },
+      zIndex: 1000,
+    })
+  }
+
+  const getMissingOfficialCharacters = () => {
+    if (!getCharactersState.data || !getOfficialCharactersState.data) return []
+    const existingNames = new Set(getCharactersState.data.map(c => c.name))
+    return getOfficialCharactersState.data.filter(
+      character => !existingNames.has(character.name),
+    )
+  }
+
+  const handleBatchAddCharacters = async () => {
+    const missingCharacters = getMissingOfficialCharacters()
+    if (missingCharacters.length === 0) return
+
+    modals.openConfirmModal({
+      id: "confirm-batch-add",
+      title: "Add Missing Official Characters",
+      centered: true,
+      children: (
+        <Box>
+          <Text size="sm" mb="md">
+            The following {missingCharacters.length} officially published
+            characters are not yet imported into this application. Do you want
+            to automatically add all of them?
+          </Text>
+          <Box style={{ maxHeight: "200px", overflowY: "auto" }}>
+            {missingCharacters.map((character, index) => (
+              <Text key={index} size="sm" mb="xs">
+                • {character.name} ({titleCase(character.type.toString())})
+              </Text>
+            ))}
+          </Box>
+        </Box>
+      ),
+      labels: {
+        confirm: "Add All",
+        cancel: "Cancel",
+      },
+      confirmProps: { color: "blue" },
+      onConfirm: async () => {
+        setMutationLoading(true)
+        try {
+          await batchAddCharacters(missingCharacters).unwrap()
+          notifications.show({
+            title: "Success",
+            message: `Added ${missingCharacters.length} characters`,
+            color: "green",
+          })
+        } catch (err) {
+          console.error("Batch add failed: ", err)
+          notifications.show({
+            title: "Add failed",
+            message:
+              // @ts-ignore
+              "Characters could not be added (error code " + err.status + ")",
+            color: "red",
+            autoClose: false,
+            position: "top-center",
+          })
+        }
+        setMutationLoading(false)
       },
       zIndex: 1000,
     })
@@ -547,13 +616,9 @@ const CharacterManager = () => {
             >
               {isMultiSelectMode ? "Exit Multi-Select" : "Multi-Select"}
             </Button>
-            {isMultiSelectMode && (
+            {isMultiSelectMode ? (
               <>
-                <Button
-                  variant="light"
-                  color="blue"
-                  onClick={handleSelectAll}
-                >
+                <Button variant="light" color="blue" onClick={handleSelectAll}>
                   Select All
                 </Button>
                 <Button
@@ -565,6 +630,16 @@ const CharacterManager = () => {
                   Delete Selected ({selectedCharacterIds.length})
                 </Button>
               </>
+            ) : (
+              <Button
+                variant="light"
+                color="blue"
+                onClick={handleBatchAddCharacters}
+                disabled={getMissingOfficialCharacters().length === 0}
+                loading={mutationLoading}
+              >
+                Add Missing Official Characters
+              </Button>
             )}
           </Group>
         </Group>

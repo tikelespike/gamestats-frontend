@@ -2,6 +2,7 @@ import React from "react"
 import { Avatar, Checkbox, Paper, Text } from "@mantine/core"
 import styles from "./CharacterCard.module.css"
 import type { Character } from "../api/apiSlice"
+import { titleCase } from "../../utils/utils"
 
 interface CharacterCardProps {
   character: Character
@@ -50,14 +51,6 @@ export function CharacterCard({
       </div>
     </Paper>
   )
-}
-
-function titleCase(str: string): string {
-  var splitStr = str.toLowerCase().split(" ")
-  for (var i = 0; i < splitStr.length; i++) {
-    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1)
-  }
-  return splitStr.join(" ")
 }
 
 export default CharacterCard
