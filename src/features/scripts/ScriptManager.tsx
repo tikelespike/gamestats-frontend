@@ -15,13 +15,19 @@ const ScriptManager = () => {
   const isSmallScreen = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
   const { data: scripts = [], isLoading, error } = useScriptsQuery()
 
-  const handleOpenAddModal = () => {
-    modals.open({
+  const handleAddScript = () => {
+    const modalId = modals.open({
       title: "Add Script",
       centered: true,
       size: "lg",
       fullScreen: isSmallScreen,
-      children: <AddScriptModal />,
+      children: (
+        <AddScriptModal
+          onClose={() => {
+            modals.close(modalId)
+          }}
+        />
+      ),
     })
   }
 
@@ -39,12 +45,17 @@ const ScriptManager = () => {
   }
 
   const handleEditScript = (script: Script) => {
-    modals.open({
+    const modalId = modals.open({
       title: "Edit Script",
       centered: true,
       size: "lg",
       fullScreen: isSmallScreen,
-      children: <EditScriptModal script={script} />,
+      children: (
+        <EditScriptModal
+          onClose={() => modals.close(modalId)}
+          script={script}
+        />
+      ),
     })
   }
 
@@ -72,7 +83,7 @@ const ScriptManager = () => {
   return (
     <Center mt="xl">
       <Stack gap="lg">
-        <AddScriptCard onClick={handleOpenAddModal} />
+        <AddScriptCard onClick={handleAddScript} />
         {scriptCards}
       </Stack>
     </Center>

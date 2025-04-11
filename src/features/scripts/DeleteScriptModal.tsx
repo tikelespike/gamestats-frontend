@@ -5,23 +5,22 @@ import { useState } from "react"
 
 interface DeleteScriptModalProps {
   scriptId: number
+  onSuccess?: () => void
   onClose: () => void
 }
 
-const DeleteScriptModal = ({ scriptId, onClose }: DeleteScriptModalProps) => {
+const DeleteScriptModal = ({
+  scriptId,
+  onSuccess = () => {},
+  onClose,
+}: DeleteScriptModalProps) => {
   const [deleteScript] = useDeleteScriptMutation()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleDelete = async () => {
+    setIsSubmitting(true)
     try {
-      setIsSubmitting(true)
       await deleteScript(scriptId).unwrap()
-      notifications.show({
-        title: "Success",
-        message: "Script deleted successfully",
-        color: "green",
-      })
-      onClose()
     } catch (error) {
       notifications.show({
         title: "Error",
@@ -29,7 +28,15 @@ const DeleteScriptModal = ({ scriptId, onClose }: DeleteScriptModalProps) => {
         color: "red",
       })
       setIsSubmitting(false)
+      return
     }
+    notifications.show({
+      title: "Success",
+      message: "Script deleted successfully",
+      color: "green",
+    })
+    onClose()
+    onSuccess()
   }
 
   return (

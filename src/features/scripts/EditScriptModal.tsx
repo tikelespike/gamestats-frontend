@@ -2,14 +2,19 @@ import type { AddScriptRequest, Script } from "../api/apiSlice"
 import { useEditScriptMutation } from "../api/apiSlice"
 import { notifications } from "@mantine/notifications"
 import ScriptForm from "./ScriptForm"
-import { modals } from "@mantine/modals"
 import { useState } from "react"
 
 interface EditScriptModalProps {
   script: Script
+  onSuccess?: () => void
+  onClose: () => void
 }
 
-const EditScriptModal = ({ script }: EditScriptModalProps) => {
+const EditScriptModal = ({
+  script,
+  onSuccess = () => {},
+  onClose,
+}: EditScriptModalProps) => {
   const [editScript] = useEditScriptMutation()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -21,12 +26,6 @@ const EditScriptModal = ({ script }: EditScriptModalProps) => {
         version: script.version,
         ...values,
       }).unwrap()
-      notifications.show({
-        title: "Success",
-        message: "Script updated successfully",
-        color: "green",
-      })
-      modals.closeAll()
     } catch (error) {
       notifications.show({
         title: "Error",
@@ -34,7 +33,15 @@ const EditScriptModal = ({ script }: EditScriptModalProps) => {
         color: "red",
       })
       setIsLoading(false)
+      return
     }
+    notifications.show({
+      title: "Success",
+      message: "Script updated successfully",
+      color: "green",
+    })
+    onClose()
+    onSuccess()
   }
 
   return (

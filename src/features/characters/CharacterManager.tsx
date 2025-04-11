@@ -37,7 +37,8 @@ import { notifications } from "@mantine/notifications"
 import { modals } from "@mantine/modals"
 import styles from "./CharacterManager.module.css"
 import AddCharacterCard from "./AddCharacterCard"
-import { titleCase } from "../../utils/utils"
+import { BatchDeleteDialog } from "./BatchDeleteDialog"
+import { BatchAddDialog } from "./BatchAddDialog"
 
 const CharacterManager = () => {
   const theme: MantineTheme = useMantineTheme()
@@ -231,47 +232,30 @@ const CharacterManager = () => {
     )
   }
 
-  const handleBatchDelete = async () => {
-    if (selectedCharacterIds.length === 0) return
-
-    modals.openConfirmModal({
-      id: "confirm-batch-delete",
+  const handleBatchDelete = () => {
+    if (
+      selectedCharacterIds.length === 0 ||
+      getCharactersState.data === undefined
+    ) {
+      return
+    }
+    const selectedCharacters = getCharactersState.data.filter(character =>
+      selectedCharacterIds.includes(character.id),
+    )
+    const modalId = modals.open({
       title: "Delete Selected Characters",
-      centered: true,
       children: (
-        <Text size="sm">
-          Are you sure you want to delete {selectedCharacterIds.length} selected
-          characters? This action cannot be undone. All games using these
-          characters will be affected.
-        </Text>
+        <BatchDeleteDialog
+          selectedCharacters={selectedCharacters}
+          onClose={() => {
+            modals.close(modalId)
+          }}
+          onSuccess={() => {
+            setIsMultiSelectMode(false)
+            setSelectedCharacterIds([])
+          }}
+        />
       ),
-      labels: {
-        confirm: "Delete Characters",
-        cancel: "Cancel",
-      },
-      confirmProps: { color: "red" },
-      onConfirm: async () => {
-        setDeleteLoading(true)
-        console.log("Deleting characters: ", selectedCharacterIds)
-        try {
-          await batchDeleteCharacters(selectedCharacterIds).unwrap()
-          setIsMultiSelectMode(false)
-          setSelectedCharacterIds([])
-        } catch (err) {
-          console.error("Batch delete failed: ", err)
-          notifications.show({
-            title: "Delete failed",
-            message:
-              // @ts-ignore
-              "Characters could not be deleted (error code " + err.status + ")",
-            color: "red",
-            autoClose: false,
-            position: "top-center",
-          })
-        }
-        setDeleteLoading(false)
-      },
-      zIndex: 1000,
     })
   }
 
@@ -283,59 +267,20 @@ const CharacterManager = () => {
     )
   }
 
-  const handleBatchAddCharacters = async () => {
+  const handleBatchAddCharacters = () => {
     const missingCharacters = getMissingOfficialCharacters()
     if (missingCharacters.length === 0) return
 
-    modals.openConfirmModal({
-      id: "confirm-batch-add",
+    const modalId = modals.open({
       title: "Add Missing Official Characters",
-      centered: true,
       children: (
-        <Box>
-          <Text size="sm" mb="md">
-            The following {missingCharacters.length} officially published
-            characters are not yet imported into this application. Do you want
-            to automatically add all of them?
-          </Text>
-          <Box style={{ maxHeight: "200px", overflowY: "auto" }}>
-            {missingCharacters.map((character, index) => (
-              <Text key={index} size="sm" mb="xs">
-                • {character.name} ({titleCase(character.type.toString())})
-              </Text>
-            ))}
-          </Box>
-        </Box>
+        <BatchAddDialog
+          onClose={() => {
+            modals.close(modalId)
+          }}
+          characters={missingCharacters}
+        />
       ),
-      labels: {
-        confirm: "Add All",
-        cancel: "Cancel",
-      },
-      confirmProps: { color: "blue" },
-      onConfirm: async () => {
-        setMutationLoading(true)
-        try {
-          await batchAddCharacters(missingCharacters).unwrap()
-          notifications.show({
-            title: "Success",
-            message: `Added ${missingCharacters.length} characters`,
-            color: "green",
-          })
-        } catch (err) {
-          console.error("Batch add failed: ", err)
-          notifications.show({
-            title: "Add failed",
-            message:
-              // @ts-ignore
-              "Characters could not be added (error code " + err.status + ")",
-            color: "red",
-            autoClose: false,
-            position: "top-center",
-          })
-        }
-        setMutationLoading(false)
-      },
-      zIndex: 1000,
     })
   }
 
