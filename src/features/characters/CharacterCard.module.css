@@ -24,7 +24,7 @@
 
 .characterCard.selected {
     border-color: var(--mantine-color-blue-6);
-    background-color: var(--mantine-color-blue-0);
+    background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-4));
 }
 
 .textContainer {
