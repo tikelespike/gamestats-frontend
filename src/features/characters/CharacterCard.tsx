@@ -16,6 +16,11 @@ export function CharacterCard({
   isSelected = false,
   isMultiSelectMode = false,
 }: CharacterCardProps) {
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onClick()
+  }
+
   return (
     <Paper
       withBorder
@@ -31,8 +36,9 @@ export function CharacterCard({
         <Checkbox
           checked={isSelected}
           onChange={() => {}}
-          onClick={e => e.stopPropagation()}
+          onClick={handleCheckboxClick}
           size="sm"
+          className={styles.checkbox}
         />
       )}
       <Avatar size={50} src={character.imageUrl} radius={50} my="xs" />
