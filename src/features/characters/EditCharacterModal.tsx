@@ -1,7 +1,6 @@
 import React from "react"
 import {
   ActionIcon,
-  Autocomplete,
   Button,
   Grid,
   Group,
@@ -13,10 +12,8 @@ import { IconExternalLink } from "@tabler/icons-react"
 import { useForm } from "@mantine/form"
 import type { Character } from "../api/apiSlice"
 import {
-  type AddCharacterRequest,
   useDeleteCharacterMutation,
   useEditCharacterMutation,
-  useOfficialCharactersQuery,
 } from "../api/apiSlice"
 import { notifications } from "@mantine/notifications"
 
@@ -34,15 +31,6 @@ export function EditCharacterModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false)
   const [editCharacter] = useEditCharacterMutation()
   const [deleteCharacter] = useDeleteCharacterMutation()
-  const getOfficialCharactersState = useOfficialCharactersQuery()
-
-  const officialCharacters: AddCharacterRequest[] =
-    getOfficialCharactersState.isSuccess && getOfficialCharactersState.data
-      ? getOfficialCharactersState.data
-      : []
-  const officialNames: string[] = officialCharacters.map(
-    character => character.name,
-  )
 
   const form = useForm<Character>({
     initialValues: {
@@ -121,12 +109,11 @@ export function EditCharacterModal({
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Grid gutter={"lg"}>
           <Grid.Col span={6}>
-            <Autocomplete
+            <TextInput
               label="Character Name"
               disabled={isSubmitting || isDeleting}
               placeholder="Fortune Teller"
               withAsterisk
-              data={officialNames}
               {...form.getInputProps("name")}
             />
           </Grid.Col>

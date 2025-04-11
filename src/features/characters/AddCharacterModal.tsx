@@ -10,10 +10,12 @@ import {
 } from "@mantine/core"
 import { IconExternalLink, IconWand } from "@tabler/icons-react"
 import { useForm } from "@mantine/form"
-import type { AddCharacterRequest } from "../api/apiSlice"
 import {
+  AddCharacterRequest,
+  Character,
   CharacterType,
   useAddCharacterMutation,
+  useCharactersQuery,
   useOfficialCharactersQuery,
 } from "../api/apiSlice"
 import { notifications } from "@mantine/notifications"
@@ -27,6 +29,8 @@ export function AddCharacterModal({ onClose }: AddCharacterModalProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [addCharacter] = useAddCharacterMutation()
   const getOfficialCharactersState = useOfficialCharactersQuery()
+  const getCharactersState = useCharactersQuery()
+  const characters: Character[] = getCharactersState.data || []
 
   const officialCharacters: AddCharacterRequest[] =
     getOfficialCharactersState.isSuccess && getOfficialCharactersState.data
@@ -100,7 +104,9 @@ export function AddCharacterModal({ onClose }: AddCharacterModalProps) {
             disabled={isSubmitting}
             placeholder="Fortune Teller"
             withAsterisk
-            data={officialNames}
+            data={officialNames.filter(
+              name => !characters.some(c => c.name === name),
+            )}
             {...form.getInputProps("name")}
             rightSection={
               <ActionIcon

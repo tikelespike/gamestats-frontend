@@ -226,8 +226,9 @@ const CharacterManager = () => {
               onClick={handleBatchAddCharacters}
               disabled={missingOfficialCharacters.length === 0}
             >
-              Import {missingOfficialCharacters.length} new character
-              {missingOfficialCharacters.length > 1 ? "s" : ""}
+              {missingOfficialCharacters.length > 0
+                ? `Import ${missingOfficialCharacters.length} new character${missingOfficialCharacters.length > 1 ? "s" : ""}`
+                : "No new characters"}
             </Button>
           )}
         </Group>
