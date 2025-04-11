@@ -213,6 +213,11 @@ const CharacterManager = () => {
     setSelectedCharacterIds([])
   }
 
+  const handleSelectAll = () => {
+    if (getCharactersState.data === undefined) return
+    setSelectedCharacterIds(getCharactersState.data.map(character => character.id))
+  }
+
   const handleToggleCharacterSelection = (id: number) => {
     setSelectedCharacterIds(prev =>
       prev.includes(id)
@@ -543,14 +548,23 @@ const CharacterManager = () => {
               {isMultiSelectMode ? "Exit Multi-Select" : "Multi-Select"}
             </Button>
             {isMultiSelectMode && (
-              <Button
-                color="red"
-                disabled={selectedCharacterIds.length === 0}
-                onClick={handleBatchDelete}
-                loading={deleteLoading}
-              >
-                Delete Selected ({selectedCharacterIds.length})
-              </Button>
+              <>
+                <Button
+                  variant="light"
+                  color="blue"
+                  onClick={handleSelectAll}
+                >
+                  Select All
+                </Button>
+                <Button
+                  color="red"
+                  disabled={selectedCharacterIds.length === 0}
+                  onClick={handleBatchDelete}
+                  loading={deleteLoading}
+                >
+                  Delete Selected ({selectedCharacterIds.length})
+                </Button>
+              </>
             )}
           </Group>
         </Group>
