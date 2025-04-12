@@ -38,6 +38,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
           href={script.wikiPageLink}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
         >
           <IconExternalLink size={16} />
         </ActionIcon>
@@ -46,7 +47,10 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
         <ActionIcon
           variant="subtle"
           color="blue"
-          onClick={() => onEdit(script)}
+          onClick={e => {
+            e.stopPropagation()
+            onEdit(script)
+          }}
         >
           <IconEdit size={16} />
         </ActionIcon>
@@ -55,20 +59,23 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
         <ActionIcon
           variant="subtle"
           color="red"
-          onClick={() => onDelete(script)}
+          onClick={e => {
+            e.stopPropagation()
+            onDelete(script)
+          }}
         >
           <IconTrash size={16} />
         </ActionIcon>
       )}
     </Group>
   )
+
   const characterAvatars = (
     <Group gap="xs" ml="md">
       {scriptCharacters.slice(0, 5).map(character => (
         <Avatar
           key={character.id}
           src={character.imageUrl || undefined}
-          alt={character.name}
           radius="xl"
           size="md"
         />
@@ -80,6 +87,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
       )}
     </Group>
   )
+
   const bodyContent = (
     <>
       {script.description ? (
@@ -94,6 +102,7 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
       {characterAvatars}
     </>
   )
+
   return (
     <Card
       shadow="sm"
