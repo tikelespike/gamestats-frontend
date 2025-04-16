@@ -3,6 +3,7 @@ import {
   Avatar,
   Card,
   Group,
+  Skeleton,
   Stack,
   Text,
   useMantineTheme,
@@ -23,7 +24,7 @@ interface ScriptCardProps {
 export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
   const theme = useMantineTheme()
   const isSmallWidth = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
-  const { data: characters } = useCharactersQuery()
+  const { data: characters, isLoading } = useCharactersQuery()
 
   const scriptCharacters =
     characters?.filter(char => script.characterIds.includes(char.id)) || []
@@ -72,17 +73,26 @@ export function ScriptCard({ script, onEdit, onDelete }: ScriptCardProps) {
 
   const characterAvatars = (
     <Group gap="xs" ml="md">
-      {scriptCharacters.slice(0, 5).map(character => (
-        <Avatar
-          key={character.id}
-          src={character.imageUrl || undefined}
-          radius="xl"
-          size="md"
-        />
-      ))}
-      {scriptCharacters.length > 5 && (
+      {isLoading
+        ? // Show skeleton avatars while loading
+          Array.from({ length: Math.min(5, script.characterIds.length) }).map(
+            (_, index) => (
+              <Skeleton key={index} radius="xl" height={38} width={38} />
+            ),
+          )
+        : scriptCharacters
+            .slice(0, 5)
+            .map(character => (
+              <Avatar
+                key={character.id}
+                src={character.imageUrl || undefined}
+                radius="xl"
+                size="md"
+              />
+            ))}
+      {script.characterIds.length > 5 && (
         <Avatar radius="xl" size="md" color="blue">
-          +{scriptCharacters.length - 5}
+          +{script.characterIds.length - 5}
         </Avatar>
       )}
     </Group>
