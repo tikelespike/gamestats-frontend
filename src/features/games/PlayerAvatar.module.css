@@ -1,0 +1,5 @@
+.avatar {
+    box-shadow: var(--mantine-shadow-xs);
+    padding: var(--mantine-spacing-md);
+    background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+}
