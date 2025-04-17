@@ -69,7 +69,7 @@ const GameManager = () => {
     <div>
       <h1>Game Manager</h1>
       <Card shadow={"lg"} withBorder>
-        <PlayerCircle players={exampleData} />
+        <PlayerCircle players={exampleData} onAddPlayer={() => {}} />
       </Card>
     </div>
   )

@@ -1,6 +1,7 @@
 import type { FC } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import styles from "./PlayerCircle.module.css"
+import { IconPlus } from "@tabler/icons-react"
 
 interface Player {
   id: number
@@ -10,6 +11,7 @@ interface Player {
 
 interface PlayerCircleProps {
   players: Player[]
+  onAddPlayer?: () => void
 }
 
 const calculatePosition = (
@@ -17,7 +19,7 @@ const calculatePosition = (
   totalPlayers: number,
   radius: number,
 ): { x: number; y: number } => {
-  const angle = (index / totalPlayers) * 2 * Math.PI
+  const angle = (index / totalPlayers) * 2 * Math.PI + Math.PI / 2
 
   const x = radius + radius * Math.cos(angle)
   const y = radius + radius * Math.sin(angle)
@@ -25,23 +27,41 @@ const calculatePosition = (
   return { x, y }
 }
 
-const PlayerCircle: FC<PlayerCircleProps> = ({ players }) => {
-  const maxRadius: number = 400
-  const radius: number = maxRadius * ((players.length + 4) / 24)
+const PlayerCircle: FC<PlayerCircleProps> = ({ players, onAddPlayer }) => {
+  const elements = players.map(player => (
+    <PlayerAvatar
+      key={player.id}
+      imageUrl={player.imageUrl}
+      name={player.name}
+    />
+  ))
 
-  const avatars = players.map((player, index) => {
-    const position = calculatePosition(index, players.length, radius)
+  if (onAddPlayer) {
+    elements.unshift(
+      <PlayerAvatar
+        key="add-player"
+        name="Add Player"
+        onClick={onAddPlayer}
+        placeholder={<IconPlus size={"md"} />}
+      />,
+    )
+  }
+
+  const maxRadius: number = 400
+  const radius: number = maxRadius * ((elements.length + 4) / 24)
+
+  const positionedElements = elements.map((element, index) => {
+    const position = calculatePosition(index, elements.length, radius)
 
     return (
       <div
-        key={player.id}
         style={{
           position: "absolute",
           left: `${position.x}px`,
           top: `${position.y}px`,
         }}
       >
-        <PlayerAvatar imageUrl={player.imageUrl} name={player.name} />
+        {element}
       </div>
     )
   })
@@ -54,7 +74,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({ players }) => {
         height: `${2 * radius + 100}px`,
       }}
     >
-      {avatars}
+      {positionedElements}
     </div>
   )
 }
