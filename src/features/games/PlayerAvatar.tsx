@@ -15,6 +15,7 @@ const PlayerAvatar = ({ name, imageUrl }: PlayerAvatarProps) => {
         size="xl"
         radius="100%"
         className={styles.avatar}
+        p={"md"}
       />
       <Text size="sm" fw={500} ta="center">
         {name}
