@@ -1,4 +1,4 @@
 .avatar {
     box-shadow: var(--mantine-shadow-xs);
-    background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+    background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-5));
 }

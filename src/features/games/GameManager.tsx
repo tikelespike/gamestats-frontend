@@ -1,5 +1,7 @@
 import React from "react"
 import PlayerAvatar from "./PlayerAvatar"
+import styles from "./GameManager.module.css"
+import { Card } from "@mantine/core"
 
 const GameManager = () => {
   const exampleData = [
@@ -65,18 +67,48 @@ const GameManager = () => {
     },
   ]
 
+  const calculatePosition = (
+    index: number,
+    totalPlayers: number,
+    radius: number,
+  ): { x: number; y: number } => {
+    const angle = (index / totalPlayers) * 2 * Math.PI
+
+    const x = radius + radius * Math.cos(angle)
+    const y = radius + radius * Math.sin(angle)
+
+    return { x, y }
+  }
+
   return (
     <div>
       <h1>Game Manager</h1>
-      <div>
-        {exampleData.map(player => (
-          <PlayerAvatar
-            key={player.id}
-            imageUrl={player.imageUrl}
-            name={player.name}
-          />
-        ))}
-      </div>
+      <Card shadow={"lg"} withBorder>
+        <div className={styles.circleContainer}>
+          {exampleData.map((player, index) => {
+            const maxRadius: number = 400
+            const radius: number = maxRadius * ((exampleData.length + 4) / 24)
+            const position = calculatePosition(
+              index,
+              exampleData.length,
+              radius,
+            )
+
+            return (
+              <div
+                key={player.id}
+                style={{
+                  position: "absolute",
+                  left: `${position.x}px`,
+                  top: `${position.y}px`,
+                }}
+              >
+                <PlayerAvatar imageUrl={player.imageUrl} name={player.name} />
+              </div>
+            )
+          })}
+        </div>
+      </Card>
     </div>
   )
 }

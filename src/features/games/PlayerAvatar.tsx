@@ -11,7 +11,6 @@ const PlayerAvatar = ({ name, imageUrl }: PlayerAvatarProps) => {
     <Stack align="center" gap="xs">
       <Avatar
         src={imageUrl}
-        alt={name}
         size="xl"
         radius="100%"
         className={styles.avatar}
