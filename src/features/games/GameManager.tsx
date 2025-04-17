@@ -80,14 +80,21 @@ const GameManager = () => {
     return { x, y }
   }
 
+  const maxRadius: number = 400
+  const radius: number = maxRadius * ((exampleData.length + 4) / 24)
+
   return (
     <div>
       <h1>Game Manager</h1>
       <Card shadow={"lg"} withBorder>
-        <div className={styles.circleContainer}>
+        <div
+          className={styles.circleContainer}
+          style={{
+            width: `${2 * radius + 100}px`,
+            height: `${2 * radius + 100}px`,
+          }}
+        >
           {exampleData.map((player, index) => {
-            const maxRadius: number = 400
-            const radius: number = maxRadius * ((exampleData.length + 4) / 24)
             const position = calculatePosition(
               index,
               exampleData.length,
