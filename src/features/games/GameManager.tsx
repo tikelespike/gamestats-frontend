@@ -1,4 +1,4 @@
-import { Box, Card, Group, Text } from "@mantine/core"
+import { Box, Card, Group, Text, Collapse } from "@mantine/core"
 import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
 import { useState } from "react"
@@ -93,7 +93,7 @@ const GameManager = () => {
           </Text>
         </Group>
 
-        {!isCollapsed && (
+        <Collapse in={!isCollapsed}>
           <Box pt={"xs"}>
             <Text c={"dimmed"}>
               Gut gewinnt nachdem am zweiten Tag erraten wurde, dass Pauline der
@@ -101,7 +101,7 @@ const GameManager = () => {
             </Text>
             <PlayerCircle players={exampleData} onAddPlayer={() => {}} />
           </Box>
-        )}
+        </Collapse>
       </Card>
     </div>
   )
