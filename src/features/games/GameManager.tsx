@@ -1,7 +1,15 @@
-import { Card } from "@mantine/core"
+import { Box, Card, Group, Text } from "@mantine/core"
+import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
+import { useState } from "react"
+import styles from "./GameManager.module.css"
 
 const GameManager = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed)
+  }
   const exampleData = [
     {
       id: 1,
@@ -67,9 +75,33 @@ const GameManager = () => {
 
   return (
     <div>
-      <h1>Game Manager</h1>
-      <Card shadow={"lg"} withBorder>
-        <PlayerCircle players={exampleData} onAddPlayer={() => {}} />
+      <Card shadow={"lg"} px={"xl"} withBorder>
+        <Group
+          className={styles.titleBar}
+          onClick={toggleCollapse}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => e.key === "Enter" && toggleCollapse()}
+        >
+          {isCollapsed ? (
+            <IconChevronRight size="1.2rem" />
+          ) : (
+            <IconChevronDown size="1.2rem" />
+          )}
+          <Text fw={500} my={"xs"} size="lg">
+            Monthly Meetup April 2025 - First Game
+          </Text>
+        </Group>
+
+        {!isCollapsed && (
+          <Box pt={"xs"}>
+            <Text c={"dimmed"}>
+              Gut gewinnt nachdem am zweiten Tag erraten wurde, dass Pauline der
+              Imp ist.
+            </Text>
+            <PlayerCircle players={exampleData} onAddPlayer={() => {}} />
+          </Box>
+        )}
       </Card>
     </div>
   )

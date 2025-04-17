@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { type FC } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import styles from "./PlayerCircle.module.css"
 import { IconPlus } from "@tabler/icons-react"

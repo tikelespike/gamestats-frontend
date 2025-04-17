@@ -1,0 +1,8 @@
+.titleBar {
+    cursor: pointer;
+    user-select: none;
+}
+
+:root[data-mantine-color-scheme="dark"] .titleBar {
+    background-color: var(--mantine-color-dark-6);
+}
