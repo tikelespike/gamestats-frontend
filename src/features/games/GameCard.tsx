@@ -1,5 +1,4 @@
-import type { FC } from "react"
-import React from "react"
+import React, { FC } from "react"
 import {
   ActionIcon,
   Button,
@@ -44,6 +43,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
   const [isEditing, setIsEditing] = React.useState(false)
   const [editGame] = useEditGameMutation()
+  const [editTriggered, setEditTriggered] = React.useState(false)
 
   const [opened, { open, toggle }] = useDisclosure(false)
   const scripts = useScriptsQuery()
@@ -73,6 +73,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   })
 
   const handleSave = async () => {
+    setEditTriggered(true)
     try {
       await editGame({
         ...game,
@@ -91,6 +92,8 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
         message: "Failed to update game. Please try again.",
         color: "red",
       })
+    } finally {
+      setEditTriggered(false)
     }
   }
 
@@ -137,6 +140,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
               size="sm"
               w="100%"
               maw={500}
+              disabled={editTriggered}
             />
           ) : (
             <Text fw={500} size="md">
@@ -151,10 +155,16 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
               color="gray"
               onClick={handleCancel}
               size="xs"
+              disabled={editTriggered}
             >
               Cancel
             </Button>
-            <Button onClick={handleSave} size="xs" disabled={!form.isValid()}>
+            <Button
+              onClick={handleSave}
+              size="xs"
+              disabled={!form.isValid() || editTriggered}
+              loading={editTriggered}
+            >
               Save
             </Button>
           </Group>
@@ -239,6 +249,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
               size="sm"
               autosize
               maxRows={16}
+              disabled={editTriggered}
             />
           ) : (
             <Text mb={"md"} c={"dimmed"}>
