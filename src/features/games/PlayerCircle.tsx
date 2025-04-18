@@ -1,16 +1,11 @@
-import { type FC } from "react"
+import { type FC, ReactNode } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import styles from "./PlayerCircle.module.css"
 import { IconPlus } from "@tabler/icons-react"
-
-interface Player {
-  id: number
-  name: string
-  imageUrl?: string
-}
+import type { PlayerParticipation } from "../api/apiSlice"
 
 interface PlayerCircleProps {
-  players: Player[]
+  participations: PlayerParticipation[]
   onAddPlayer?: () => void
 }
 
@@ -27,24 +22,33 @@ const calculatePosition = (
   return { x, y }
 }
 
-const PlayerCircle: FC<PlayerCircleProps> = ({ players, onAddPlayer }) => {
-  const elements = players.map(player => (
-    <PlayerAvatar
-      key={player.id}
-      imageUrl={player.imageUrl}
-      name={player.name}
-    />
-  ))
+const PlayerCircle: FC<PlayerCircleProps> = ({
+  participations,
+  onAddPlayer,
+}) => {
+  const elements: { element: ReactNode; key: number | string }[] =
+    participations.map(participation => ({
+      element: (
+        <PlayerAvatar
+          key={participation.playerId}
+          participation={participation}
+        />
+      ),
+      key: participation.playerId,
+    }))
 
   if (onAddPlayer) {
-    elements.unshift(
-      <PlayerAvatar
-        key="add-player"
-        name="Add Player"
-        onClick={onAddPlayer}
-        placeholder={<IconPlus size={"md"} />}
-      />,
-    )
+    elements.unshift({
+      element: (
+        <PlayerAvatar
+          key="add-player"
+          overrideText="Add Player"
+          onClick={onAddPlayer}
+          placeholder={<IconPlus size={"md"} />}
+        />
+      ),
+      key: "add-player",
+    })
   }
 
   const maxRadius: number = 400
@@ -60,8 +64,9 @@ const PlayerCircle: FC<PlayerCircleProps> = ({ players, onAddPlayer }) => {
           left: `${position.x}px`,
           top: `${position.y}px`,
         }}
+        key={element.key}
       >
-        {element}
+        {element.element}
       </div>
     )
   })

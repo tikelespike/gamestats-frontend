@@ -30,6 +30,11 @@ export enum CharacterType {
   Traveller = "traveller",
 }
 
+export enum Alignment {
+  Good = "good",
+  Evil = "evil",
+}
+
 export interface Character {
   id: number
   version: number
@@ -64,6 +69,26 @@ export interface AddScriptRequest {
   characterIds: number[]
 }
 
+export interface PlayerParticipation {
+  playerId: number
+  initialCharacterId: number
+  initialAlignment: Alignment
+  endCharacterId: number
+  endAlignment: Alignment
+  isAliveAtEnd: boolean
+}
+
+export interface Game {
+  id: number
+  version: number
+  name: string
+  description: string | null
+  scriptId: number
+  winningAlignment: string
+  winningPlayerIds: number[]
+  participants: PlayerParticipation[]
+}
+
 export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL as string,
@@ -77,7 +102,7 @@ export const apiSlice = createApi({
     },
     timeout: 5000,
   }),
-  tagTypes: ["Players", "Characters", "Scripts"],
+  tagTypes: ["Players", "Characters", "Scripts", "Games"],
   endpoints: builder => ({
     login: builder.mutation<UserResponse, LoginRequest>({
       query: credentials => ({
@@ -138,7 +163,7 @@ export const apiSlice = createApi({
         url: `/characters/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Characters", "Scripts"], // Deleting a character will remove it from any scripts it was in
+      invalidatesTags: ["Characters", "Scripts", "Games"], // Deleting a character will remove it from any scripts and games it was in
     }),
     batchDeleteCharacters: builder.mutation<void, number[]>({
       query: ids => ({
@@ -146,7 +171,7 @@ export const apiSlice = createApi({
         method: "DELETE",
         body: ids,
       }),
-      invalidatesTags: ["Characters", "Scripts"],
+      invalidatesTags: ["Characters", "Scripts", "Games"],
     }),
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
@@ -176,7 +201,11 @@ export const apiSlice = createApi({
         url: `/scripts/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Scripts"],
+      invalidatesTags: ["Scripts", "Games"],
+    }),
+    games: builder.query<Game[], void>({
+      query: () => "/games",
+      providesTags: ["Games"],
     }),
   }),
 })
@@ -197,4 +226,5 @@ export const {
   useAddScriptMutation,
   useEditScriptMutation,
   useDeleteScriptMutation,
+  useGamesQuery,
 } = apiSlice
