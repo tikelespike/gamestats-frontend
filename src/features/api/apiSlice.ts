@@ -214,6 +214,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Games"],
     }),
+    editGame: builder.mutation<Game, Game>({
+      query: request => ({
+        url: `/games/${request.id}`,
+        method: "PUT",
+        body: request,
+      }),
+      invalidatesTags: ["Games"],
+    }),
   }),
 })
 
@@ -235,4 +243,5 @@ export const {
   useDeleteScriptMutation,
   useGamesQuery,
   useDeleteGameMutation,
+  useEditGameMutation,
 } = apiSlice

@@ -1,4 +1,5 @@
 import type { FC } from "react"
+import React from "react"
 import {
   ActionIcon,
   Button,
@@ -7,6 +8,8 @@ import {
   Group,
   Stack,
   Text,
+  Textarea,
+  TextInput,
   ThemeIcon,
   useMantineTheme,
 } from "@mantine/core"
@@ -15,13 +18,21 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconCrown,
+  IconEdit,
   IconScript,
   IconTrash,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
-import { Game, usePlayersQuery, useScriptsQuery } from "../api/apiSlice"
+import type { Game } from "../api/apiSlice"
+import {
+  useEditGameMutation,
+  usePlayersQuery,
+  useScriptsQuery,
+} from "../api/apiSlice"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { truncate } from "../../utils/utils"
+import { useForm } from "@mantine/form"
+import { notifications } from "@mantine/notifications"
 
 interface GameCardProps {
   game: Game
@@ -31,8 +42,10 @@ interface GameCardProps {
 const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
+  const [isEditing, setIsEditing] = React.useState(false)
+  const [editGame] = useEditGameMutation()
 
-  const [opened, { toggle }] = useDisclosure(false)
+  const [opened, { open, toggle }] = useDisclosure(false)
   const scripts = useScriptsQuery()
   const players = usePlayersQuery()
   const winningNames = game.winningPlayerIds.map(id => {
@@ -49,54 +62,151 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     ? `${game.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
     : winnersJoined
 
+  const form = useForm({
+    initialValues: {
+      name: game.name,
+      description: game.description || "",
+    },
+    validate: {
+      name: value => (value.trim().length > 0 ? null : "Game name is required"),
+    },
+  })
+
+  const handleSave = async () => {
+    try {
+      await editGame({
+        ...game,
+        name: form.values.name,
+        description: form.values.description || null,
+      }).unwrap()
+      notifications.show({
+        title: "Success",
+        message: "Game updated successfully",
+        color: "green",
+      })
+      setIsEditing(false)
+    } catch (error) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to update game. Please try again.",
+        color: "red",
+      })
+    }
+  }
+
+  const handleCancel = () => {
+    form.reset()
+    setIsEditing(false)
+  }
+
+  const handleEditClick = e => {
+    e.stopPropagation()
+    form.setValues({
+      name: game.name,
+      description: game.description || "",
+    })
+    open()
+    setIsEditing(true)
+  }
   return (
     <Card shadow={"lg"} px={"lg"} withBorder>
       <Group
         className={styles.titleBar}
-        onClick={toggle}
+        onClick={!isEditing ? toggle : undefined}
         role="button"
         tabIndex={0}
-        onKeyDown={e => e.key === "Enter" && toggle()}
+        onKeyDown={e => !isEditing && e.key === "Enter" && toggle()}
         justify="space-between"
+        wrap="nowrap"
       >
-        <Group>
-          {opened ? (
-            <IconChevronDown size="1.2rem" />
-          ) : (
-            <IconChevronRight size="1.2rem" />
-          )}
-          <Text fw={500} size="md">
-            {truncate(game.name, isMobile ? 30 : 70)}
-          </Text>
-        </Group>
-        {onDelete && (
-          <>
-            {!isMobile ? (
-              <Button
-                variant="subtle"
-                color="red"
-                leftSection={<IconTrash size={16} />}
-                onClick={e => {
-                  e.stopPropagation()
-                  onDelete()
-                }}
-                size="xs"
-              >
-                Delete
-              </Button>
+        <Group style={{ flex: 1 }} wrap="nowrap">
+          {!isEditing &&
+            (opened ? (
+              <IconChevronDown size="1.2rem" />
             ) : (
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                onClick={e => {
-                  e.stopPropagation()
-                  onDelete()
-                }}
-              >
-                <IconTrash size={16} />
-              </ActionIcon>
+              <IconChevronRight size="1.2rem" />
+            ))}
+          {isEditing ? (
+            <TextInput
+              placeholder="Game name"
+              {...form.getInputProps("name")}
+              onClick={e => e.stopPropagation()}
+              size="sm"
+              w="100%"
+              maw={500}
+            />
+          ) : (
+            <Text fw={500} size="md">
+              {truncate(game.name, isMobile ? 30 : 70)}
+            </Text>
+          )}
+        </Group>
+        {isEditing ? (
+          <Group gap="xs">
+            <Button
+              variant="subtle"
+              color="gray"
+              onClick={handleCancel}
+              size="xs"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSave} size="xs" disabled={!form.isValid()}>
+              Save
+            </Button>
+          </Group>
+        ) : (
+          <Group gap="xs">
+            {!isMobile ? (
+              <>
+                <Button
+                  variant="subtle"
+                  color="blue"
+                  leftSection={<IconEdit size={16} />}
+                  onClick={handleEditClick}
+                  size="xs"
+                >
+                  Edit
+                </Button>
+                {onDelete && (
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    leftSection={<IconTrash size={16} />}
+                    onClick={e => {
+                      e.stopPropagation()
+                      onDelete()
+                    }}
+                    size="xs"
+                  >
+                    Delete
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <ActionIcon
+                  variant="subtle"
+                  color="blue"
+                  onClick={handleEditClick}
+                >
+                  <IconEdit size={16} />
+                </ActionIcon>
+                {onDelete && (
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    onClick={e => {
+                      e.stopPropagation()
+                      onDelete()
+                    }}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                )}
+              </>
             )}
-          </>
+          </Group>
         )}
       </Group>
       <Collapse in={opened}>
@@ -119,9 +229,19 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             </ThemeIcon>
             <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
           </Group>
-          <Text mb={"md"} c={"dimmed"}>
-            {game.description}
-          </Text>
+          {isEditing ? (
+            <Textarea
+              placeholder="Game description"
+              {...form.getInputProps("description")}
+              size="sm"
+              autosize
+              maxRows={16}
+            />
+          ) : (
+            <Text mb={"md"} c={"dimmed"}>
+              {game.description}
+            </Text>
+          )}
           <PlayerCircle
             participations={game.participants}
             winningPlayerIds={game.winningPlayerIds}
