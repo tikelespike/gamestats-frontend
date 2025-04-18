@@ -36,6 +36,7 @@ const PlayerAvatar = ({
         p={"md"}
         color={""}
         variant={"transparent"}
+        data-alignment={participation?.initialAlignment}
       >
         {placeholder || <Skeleton circle width={"100%"} height={"100%"} />}
       </Avatar>

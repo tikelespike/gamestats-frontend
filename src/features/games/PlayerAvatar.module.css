@@ -3,3 +3,17 @@
     background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-5));
     border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
 }
+
+.avatar[data-alignment="good"] {
+    background: light-dark(
+        var(--mantine-color-blue-0),
+        color-mix(in srgb, var(--mantine-color-blue-3) 15%, var(--mantine-color-dark-7))
+    );
+}
+
+.avatar[data-alignment="evil"] {
+    background: light-dark(
+        var(--mantine-color-red-0),
+        color-mix(in srgb, var(--mantine-color-red-3) 15%, var(--mantine-color-dark-7))
+    );
+}
