@@ -1,8 +1,10 @@
-import { type FC, ReactNode } from "react"
+import type { ReactNode } from "react"
+import { type FC } from "react"
 import PlayerAvatar from "./PlayerAvatar"
-import styles from "./PlayerCircle.module.css"
 import { IconPlus } from "@tabler/icons-react"
 import type { PlayerParticipation } from "../api/apiSlice"
+import { Box } from "@mantine/core"
+import styles from "./PlayerCircle.module.css"
 
 interface PlayerCircleProps {
   participations: PlayerParticipation[]
@@ -72,15 +74,16 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
   })
 
   return (
-    <div
+    <Box
       className={styles.circleContainer}
       style={{
         width: `${2 * radius + 100}px`,
         height: `${2 * radius + 100}px`,
       }}
+      my={"xl"}
     >
       {positionedElements}
-    </div>
+    </Box>
   )
 }
 
