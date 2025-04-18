@@ -9,6 +9,7 @@ interface PlayerAvatarProps {
   onClick?: () => void
   placeholder?: ReactNode
   overrideText?: string
+  isWinner?: boolean
 }
 
 const PlayerAvatar = ({
@@ -16,6 +17,7 @@ const PlayerAvatar = ({
   onClick,
   placeholder,
   overrideText,
+  isWinner = false,
 }: PlayerAvatarProps) => {
   const characters = useCharactersQuery()
   const players = usePlayersQuery()
@@ -45,7 +47,7 @@ const PlayerAvatar = ({
           {overrideText ||
             players.data
               ?.find(p => p.id === participation?.playerId)
-              ?.name.split(" ")[0]}
+              ?.name.split(" ")[0] + (isWinner ? " 🏆" : "")}
         </Text>
       )}
     </Stack>

@@ -2,12 +2,13 @@ import type { ReactNode } from "react"
 import { type FC } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import { IconPlus } from "@tabler/icons-react"
-import type { PlayerParticipation } from "../api/apiSlice"
+import { PlayerParticipation } from "../api/apiSlice"
 import { Box } from "@mantine/core"
 import styles from "./PlayerCircle.module.css"
 
 interface PlayerCircleProps {
   participations: PlayerParticipation[]
+  winningPlayerIds?: number[]
   onAddPlayer?: () => void
 }
 
@@ -27,6 +28,7 @@ const calculatePosition = (
 const PlayerCircle: FC<PlayerCircleProps> = ({
   participations,
   onAddPlayer,
+  winningPlayerIds,
 }) => {
   const elements: { element: ReactNode; key: number | string }[] =
     participations.map(participation => ({
@@ -34,6 +36,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
         <PlayerAvatar
           key={participation.playerId}
           participation={participation}
+          isWinner={winningPlayerIds?.includes(participation.playerId)}
         />
       ),
       key: participation.playerId,

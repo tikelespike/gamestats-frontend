@@ -72,7 +72,10 @@ const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
           <Text mb={"md"} c={"dimmed"}>
             {game.description}
           </Text>
-          <PlayerCircle participations={game.participants} />
+          <PlayerCircle
+            participations={game.participants}
+            winningPlayerIds={game.winningPlayerIds}
+          />
         </Stack>
       </Collapse>
     </Card>
