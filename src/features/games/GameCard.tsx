@@ -1,5 +1,13 @@
 import type { FC } from "react"
-import { Card, Collapse, Group, Stack, Text, ThemeIcon } from "@mantine/core"
+import {
+  Card,
+  Collapse,
+  Group,
+  Stack,
+  Text,
+  ThemeIcon,
+  useMantineTheme,
+} from "@mantine/core"
 import styles from "./GameManager.module.css"
 import {
   IconChevronDown,
@@ -9,13 +17,17 @@ import {
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
 import { Game, usePlayersQuery, useScriptsQuery } from "../api/apiSlice"
-import { useDisclosure } from "@mantine/hooks"
+import { useDisclosure, useMediaQuery } from "@mantine/hooks"
+import { truncate } from "../../utils/utils"
 
 interface GameCardProps {
   game: Game
 }
 
 const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
+  const theme = useMantineTheme()
+  const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
+
   const [opened, { toggle }] = useDisclosure(false)
   const scripts = useScriptsQuery()
   const players = usePlayersQuery()
@@ -27,8 +39,14 @@ const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
     return player?.name.split(" ")[0]
   })
 
+  const winnersJoined = winningNames.join(", ")
+  const winnerTextAppendix = ` (${winnersJoined})`
+  const winnersText = game.winningAlignment
+    ? `${game.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
+    : winnersJoined
+
   return (
-    <Card shadow={"lg"} px={"xl"} withBorder>
+    <Card shadow={"lg"} px={"lg"} withBorder>
       <Group
         className={styles.titleBar}
         onClick={toggle}
@@ -41,8 +59,8 @@ const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
         ) : (
           <IconChevronRight size="1.2rem" />
         )}
-        <Text fw={500} my={"xs"} size="lg">
-          {game.name}
+        <Text fw={500} size="md">
+          {truncate(game.name, isMobile ? 30 : 70)}
         </Text>
       </Group>
       <Collapse in={opened}>
@@ -63,11 +81,7 @@ const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
             <ThemeIcon size="lg" variant="light" color="yellow">
               <IconCrown style={{ width: "70%", height: "70%" }} />
             </ThemeIcon>
-            <Text>
-              {game.winningAlignment
-                ? `${game.winningAlignment.toUpperCase()} TEAM (${winningNames.join(", ")})`
-                : winningNames.join(", ")}
-            </Text>
+            <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
           </Group>
           <Text mb={"md"} c={"dimmed"}>
             {game.description}

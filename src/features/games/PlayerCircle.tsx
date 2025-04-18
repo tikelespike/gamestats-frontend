@@ -3,7 +3,8 @@ import { type FC, useState } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import { IconPlus } from "@tabler/icons-react"
 import { PlayerParticipation } from "../api/apiSlice"
-import { Box, SegmentedControl } from "@mantine/core"
+import { Box, Grid, SegmentedControl, useMantineTheme } from "@mantine/core"
+import { useMediaQuery } from "@mantine/hooks"
 import styles from "./PlayerCircle.module.css"
 
 interface PlayerCircleProps {
@@ -31,6 +32,8 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
   winningPlayerIds,
 }) => {
   const [displayState, setDisplayState] = useState<"initial" | "final">("final")
+  const theme = useMantineTheme()
+  const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
 
   const elements: { element: ReactNode; key: number | string }[] =
     participations.map(participation => ({
@@ -57,6 +60,32 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
       ),
       key: "add-player",
     })
+  }
+
+  if (isMobile) {
+    return (
+      <Box my="xs">
+        <Box style={{ display: "flex", justifyContent: "center" }}>
+          <SegmentedControl
+            value={displayState}
+            onChange={value => setDisplayState(value as "initial" | "final")}
+            data={[
+              { label: "Beginning", value: "initial" },
+              { label: "End", value: "final" },
+            ]}
+          />
+        </Box>
+        <Grid my={"xl"} gutter="md">
+          {elements.map(element => (
+            <Grid.Col key={element.key} span={4}>
+              <Box style={{ display: "flex", justifyContent: "center" }}>
+                {element.element}
+              </Box>
+            </Grid.Col>
+          ))}
+        </Grid>
+      </Box>
+    )
   }
 
   const maxRadius: number = 400
