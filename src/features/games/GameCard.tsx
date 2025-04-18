@@ -1,5 +1,6 @@
 import type { FC } from "react"
 import {
+  ActionIcon,
   Card,
   Collapse,
   Group,
@@ -14,6 +15,7 @@ import {
   IconChevronRight,
   IconCrown,
   IconScript,
+  IconTrash,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
 import { Game, usePlayersQuery, useScriptsQuery } from "../api/apiSlice"
@@ -22,9 +24,10 @@ import { truncate } from "../../utils/utils"
 
 interface GameCardProps {
   game: Game
+  onDelete?: () => void
 }
 
-const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
+const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
 
@@ -53,15 +56,30 @@ const GameCard: FC<GameCardProps> = ({ game }: GameCardProps) => {
         role="button"
         tabIndex={0}
         onKeyDown={e => e.key === "Enter" && toggle()}
+        justify="space-between"
       >
-        {opened ? (
-          <IconChevronDown size="1.2rem" />
-        ) : (
-          <IconChevronRight size="1.2rem" />
+        <Group>
+          {opened ? (
+            <IconChevronDown size="1.2rem" />
+          ) : (
+            <IconChevronRight size="1.2rem" />
+          )}
+          <Text fw={500} size="md">
+            {truncate(game.name, isMobile ? 30 : 70)}
+          </Text>
+        </Group>
+        {onDelete && (
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            onClick={e => {
+              e.stopPropagation()
+              onDelete()
+            }}
+          >
+            <IconTrash size={16} />
+          </ActionIcon>
         )}
-        <Text fw={500} size="md">
-          {truncate(game.name, isMobile ? 30 : 70)}
-        </Text>
       </Group>
       <Collapse in={opened}>
         <Stack maw={"800px"} pt={"xl"}>
