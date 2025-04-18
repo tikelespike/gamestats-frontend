@@ -1,6 +1,7 @@
 import type { FC } from "react"
 import {
   ActionIcon,
+  Button,
   Card,
   Collapse,
   Group,
@@ -69,16 +70,33 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
           </Text>
         </Group>
         {onDelete && (
-          <ActionIcon
-            variant="subtle"
-            color="red"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete()
-            }}
-          >
-            <IconTrash size={16} />
-          </ActionIcon>
+          <>
+            {!isMobile ? (
+              <Button
+                variant="subtle"
+                color="red"
+                leftSection={<IconTrash size={16} />}
+                onClick={e => {
+                  e.stopPropagation()
+                  onDelete()
+                }}
+                size="xs"
+              >
+                Delete
+              </Button>
+            ) : (
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                onClick={e => {
+                  e.stopPropagation()
+                  onDelete()
+                }}
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+            )}
+          </>
         )}
       </Group>
       <Collapse in={opened}>
