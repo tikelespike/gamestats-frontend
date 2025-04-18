@@ -43,7 +43,9 @@ const PlayerAvatar = ({
       ) : (
         <Text size="sm" fw={500} ta="center">
           {overrideText ||
-            players.data?.find(p => p.id === participation?.playerId)?.name}
+            players.data
+              ?.find(p => p.id === participation?.playerId)
+              ?.name.split(" ")[0]}
         </Text>
       )}
     </Stack>
