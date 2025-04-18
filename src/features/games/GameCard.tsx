@@ -99,7 +99,9 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     setIsEditing(false)
   }
 
-  const handleEditClick = e => {
+  const handleEditClick: (
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) => void = e => {
     e.stopPropagation()
     form.setValues({
       name: game.name,
@@ -108,6 +110,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     open()
     setIsEditing(true)
   }
+
   return (
     <Card shadow={"lg"} px={"lg"} withBorder>
       <Group
