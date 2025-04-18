@@ -1,9 +1,9 @@
 import type { ReactNode } from "react"
-import { type FC } from "react"
+import { type FC, useState } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import { IconPlus } from "@tabler/icons-react"
 import { PlayerParticipation } from "../api/apiSlice"
-import { Box } from "@mantine/core"
+import { Box, SegmentedControl } from "@mantine/core"
 import styles from "./PlayerCircle.module.css"
 
 interface PlayerCircleProps {
@@ -30,6 +30,8 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
   onAddPlayer,
   winningPlayerIds,
 }) => {
+  const [displayState, setDisplayState] = useState<"initial" | "final">("final")
+
   const elements: { element: ReactNode; key: number | string }[] =
     participations.map(participation => ({
       element: (
@@ -37,6 +39,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
           key={participation.playerId}
           participation={participation}
           isWinner={winningPlayerIds?.includes(participation.playerId)}
+          displayState={displayState}
         />
       ),
       key: participation.playerId,
@@ -86,6 +89,23 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
       my={"xl"}
     >
       {positionedElements}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <SegmentedControl
+          value={displayState}
+          onChange={value => setDisplayState(value as "initial" | "final")}
+          data={[
+            { label: "Beginning", value: "initial" },
+            { label: "End", value: "final" },
+          ]}
+        />
+      </div>
     </Box>
   )
 }

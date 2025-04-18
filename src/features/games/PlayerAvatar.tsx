@@ -10,6 +10,7 @@ interface PlayerAvatarProps {
   placeholder?: ReactNode
   overrideText?: string
   isWinner?: boolean
+  displayState?: "initial" | "final"
 }
 
 const PlayerAvatar = ({
@@ -18,25 +19,31 @@ const PlayerAvatar = ({
   placeholder,
   overrideText,
   isWinner = false,
+  displayState = "initial",
 }: PlayerAvatarProps) => {
   const characters = useCharactersQuery()
   const players = usePlayersQuery()
 
+  const characterId =
+    displayState === "initial"
+      ? participation?.initialCharacterId
+      : participation?.endCharacterId
+  const alignment =
+    displayState === "initial"
+      ? participation?.initialAlignment
+      : participation?.endAlignment
+
   return (
     <Stack align="center" gap="xs">
       <Avatar
-        src={
-          characters.data?.find(c => c.id === participation?.initialCharacterId)
-            ?.imageUrl
-        }
+        src={characters.data?.find(c => c.id === characterId)?.imageUrl}
         size="xl"
         radius="100%"
         className={styles.avatar}
         onClick={onClick}
         p={"md"}
-        color={""}
         variant={"transparent"}
-        data-alignment={participation?.initialAlignment}
+        data-alignment={alignment}
       >
         {placeholder || <Skeleton circle width={"100%"} height={"100%"} />}
       </Avatar>
