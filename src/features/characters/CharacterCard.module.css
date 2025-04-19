@@ -24,7 +24,11 @@
 
 .characterCard.selected {
     border-color: var(--mantine-color-blue-6);
-    background-color: light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-4));
+    background-color: var(--mantine-color-blue-light);
+}
+
+.characterCard.selected:hover {
+    background-color: var(--mantine-color-blue-light-hover);
 }
 
 .textContainer {
