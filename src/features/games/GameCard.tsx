@@ -85,6 +85,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
         name: form.values.name,
         description: form.values.description || null,
         scriptId: Number(form.values.scriptId),
+        participants: editedParticipations,
       }).unwrap()
       notifications.show({
         title: "Success",
@@ -117,6 +118,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
       description: game.description || "",
       scriptId: game.scriptId.toString(),
     })
+    setEditedParticipations(game.participants)
     open()
     setIsEditing(true)
   }
