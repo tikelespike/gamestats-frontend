@@ -2,24 +2,25 @@ import { useForm } from "@mantine/form"
 import { Button, Checkbox, Grid, Group, Select } from "@mantine/core"
 import {
   type Alignment,
-  type PlayerParticipation,
   useCharactersQuery,
   usePlayersQuery,
 } from "../api/apiSlice"
+import type { IndexedPlayerParticipation } from "./GameCard"
 
 interface EditParticipationModalProps {
-  participation: PlayerParticipation
-  onChange: (updated: PlayerParticipation) => void
+  participation: IndexedPlayerParticipation
+  onChange: (updated: IndexedPlayerParticipation) => void
   onClose: () => void
 }
 
 const EditParticipationModal = ({
-  participation,
+  participation: indexedParticipation,
   onChange,
   onClose,
 }: EditParticipationModalProps) => {
   const players = usePlayersQuery()
   const characters = useCharactersQuery()
+  const participation = indexedParticipation.participation
 
   const form = useForm({
     initialValues: {
@@ -43,12 +44,15 @@ const EditParticipationModal = ({
 
   const handleSubmit = (values: typeof form.values) => {
     onChange({
-      playerId: Number(values.playerId),
-      initialCharacterId: Number(values.initialCharacterId),
-      initialAlignment: values.initialAlignment as Alignment,
-      endCharacterId: Number(values.endCharacterId),
-      endAlignment: values.endAlignment as Alignment,
-      isAliveAtEnd: values.isAliveAtEnd,
+      seatId: indexedParticipation.seatId,
+      participation: {
+        playerId: Number(values.playerId),
+        initialCharacterId: Number(values.initialCharacterId),
+        initialAlignment: values.initialAlignment as Alignment,
+        endCharacterId: Number(values.endCharacterId),
+        endAlignment: values.endAlignment as Alignment,
+        isAliveAtEnd: values.isAliveAtEnd,
+      },
     })
     onClose()
   }
@@ -60,7 +64,6 @@ const EditParticipationModal = ({
           <Select
             label="Player"
             data={playerOptions}
-            disabled
             {...form.getInputProps("playerId")}
           />
         </Grid.Col>

@@ -2,18 +2,20 @@ import type { ReactNode } from "react"
 import { type FC, useState } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import { IconPlus } from "@tabler/icons-react"
-import type { PlayerParticipation } from "../api/apiSlice"
 import { Box, Grid, SegmentedControl, useMantineTheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import styles from "./PlayerCircle.module.css"
 import { modals } from "@mantine/modals"
 import EditParticipationModal from "./EditParticipationModal"
+import type { IndexedPlayerParticipation } from "./GameCard"
 
 interface PlayerCircleProps {
-  participations: PlayerParticipation[]
+  participations: IndexedPlayerParticipation[]
   winningPlayerIds?: number[]
   isEditing?: boolean
-  onParticipationsChange?: (participations: PlayerParticipation[]) => void
+  onParticipationsChange?: (
+    participations: IndexedPlayerParticipation[],
+  ) => void
 }
 
 const calculatePosition = (
@@ -52,7 +54,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
                   onChange={updated =>
                     onParticipationsChange?.(
                       participations.map(p =>
-                        p.playerId === updated.playerId ? updated : p,
+                        p.seatId === updated.seatId ? updated : p,
                       ),
                     )
                   }
@@ -65,14 +67,16 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
       return {
         element: (
           <PlayerAvatar
-            key={participation.playerId}
-            participation={participation}
-            isWinner={winningPlayerIds?.includes(participation.playerId)}
+            key={participation.seatId}
+            participation={participation.participation}
+            isWinner={winningPlayerIds?.includes(
+              participation.participation.playerId,
+            )}
             displayState={displayState}
             onClick={handleClick}
           />
         ),
-        key: participation.playerId,
+        key: participation.seatId,
       }
     })
 

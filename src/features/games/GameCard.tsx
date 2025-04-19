@@ -35,6 +35,11 @@ import { truncate } from "../../utils/utils"
 import { useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 
+export interface IndexedPlayerParticipation {
+  participation: PlayerParticipation
+  seatId: number
+}
+
 interface GameCardProps {
   game: Game
   onDelete?: () => void
@@ -46,9 +51,16 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const [isEditing, setIsEditing] = React.useState(false)
   const [editGame] = useEditGameMutation()
   const [editTriggered, setEditTriggered] = React.useState(false)
-  const [editedParticipations, setEditedParticipations] = useState<
-    PlayerParticipation[]
-  >(game.participants)
+  // "freeze" the indices of the participations so we can use them as keys from here on
+  // out, even if the order changes. The intuition is that we are placing them on seats in a circle.
+  // We can move each circle around or change the player and its data on the seat, but it's the same seat.
+  const indexedParticipants: IndexedPlayerParticipation[] =
+    game.participants.map((participation, index) => ({
+      participation,
+      seatId: index,
+    }))
+  const [editedParticipations, setEditedParticipations] =
+    useState<IndexedPlayerParticipation[]>(indexedParticipants)
 
   const [opened, { open, toggle }] = useDisclosure(false)
   const scripts = useScriptsQuery()
@@ -86,7 +98,8 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
         name: form.values.name,
         description: form.values.description || null,
         scriptId: Number(form.values.scriptId),
-        participants: editedParticipations,
+        // use new order of list as new order of participations, throwing away the old order which was used as keys
+        participants: editedParticipations.map(p => p.participation),
       }).unwrap()
       notifications.show({
         title: "Success",
@@ -119,7 +132,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
       description: game.description || "",
       scriptId: game.scriptId.toString(),
     })
-    setEditedParticipations(game.participants)
+    setEditedParticipations(indexedParticipants)
     open()
     setIsEditing(true)
   }
@@ -286,7 +299,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
           )}
           <PlayerCircle
             participations={
-              isEditing ? editedParticipations : game.participants
+              isEditing ? editedParticipations : indexedParticipants
             }
             winningPlayerIds={game.winningPlayerIds}
             isEditing={isEditing}
