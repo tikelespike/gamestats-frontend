@@ -93,7 +93,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
                 : false
             }
             displayState={displayState}
-            onClick={handleClick}
+            onClick={isEditing ? handleClick : undefined}
           />
         ),
         key: participation.seatId,
