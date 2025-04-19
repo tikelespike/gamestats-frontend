@@ -11,3 +11,15 @@
 .avatar[data-alignment="evil"] {
     background: var(--mantine-color-red-light);
 }
+
+.shroud {
+    position: absolute;
+    top: -10%;
+    left: 15%;
+    width: 70%;
+    height: 70%;
+    opacity: 0.7;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 1;
+}

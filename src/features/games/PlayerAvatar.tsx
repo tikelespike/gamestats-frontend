@@ -3,6 +3,7 @@ import styles from "./PlayerAvatar.module.css"
 import type { ReactNode } from "react"
 import type { PlayerParticipation } from "../api/apiSlice"
 import { useCharactersQuery, usePlayersQuery } from "../api/apiSlice"
+import shroudImg from "../../assets/shroud.png"
 
 interface PlayerAvatarProps {
   participation?: PlayerParticipation
@@ -35,18 +36,31 @@ const PlayerAvatar = ({
 
   return (
     <Stack align="center" gap="xs">
-      <Avatar
-        src={characters.data?.find(c => c.id === characterId)?.imageUrl}
-        size="xl"
-        radius="100%"
-        className={styles.avatar}
-        onClick={onClick}
-        p={"md"}
-        variant={"transparent"}
-        data-alignment={alignment}
+      <div
+        style={{
+          position: "relative",
+          display: "inline-block",
+          overflow: "visible",
+        }}
       >
-        {placeholder || <Skeleton circle width={"100%"} height={"100%"} />}
-      </Avatar>
+        <Avatar
+          src={characters.data?.find(c => c.id === characterId)?.imageUrl}
+          size="xl"
+          radius="100%"
+          className={styles.avatar}
+          onClick={onClick}
+          p={"md"}
+          variant={"transparent"}
+          data-alignment={alignment}
+        >
+          {placeholder || <Skeleton circle width={"100%"} height={"100%"} />}
+        </Avatar>
+        {displayState === "final" &&
+          participation &&
+          !participation.isAliveAtEnd && (
+            <img src={shroudImg} alt="shroud" className={styles.shroud} />
+          )}
+      </div>
 
       {players.isLoading && participation && !overrideText ? (
         <Skeleton width={"80px"} height={"15px"} />
