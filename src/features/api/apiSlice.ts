@@ -70,7 +70,7 @@ export interface AddScriptRequest {
 }
 
 export interface PlayerParticipation {
-  playerId: number
+  playerId: number | null
   initialCharacterId: number
   initialAlignment: Alignment
   endCharacterId: number

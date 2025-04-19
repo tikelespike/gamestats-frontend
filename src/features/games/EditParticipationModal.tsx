@@ -24,7 +24,7 @@ const EditParticipationModal = ({
 
   const form = useForm({
     initialValues: {
-      playerId: participation.playerId.toString(),
+      playerId: participation.playerId?.toString(),
       initialCharacterId: participation.initialCharacterId.toString(),
       initialAlignment: participation.initialAlignment,
       endCharacterId: participation.endCharacterId.toString(),

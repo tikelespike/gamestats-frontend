@@ -43,35 +43,55 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
 
   const elements: { element: ReactNode; key: number | string }[] =
     participations.map(participation => {
-      const handleClick = isEditing
-        ? () => {
-            const modalId = modals.open({
-              title: "Edit Participation",
-              centered: true,
-              children: (
-                <EditParticipationModal
-                  participation={participation}
-                  onChange={updated =>
-                    onParticipationsChange?.(
-                      participations.map(p =>
-                        p.seatId === updated.seatId ? updated : p,
-                      ),
-                    )
-                  }
-                  onClose={() => modals.close(modalId)}
-                />
-              ),
-            })
-          }
-        : undefined
+      const handleClick = () => {
+        const onParticipationUpdate: (
+          updated: IndexedPlayerParticipation,
+        ) => void = updated => {
+          const player = updated.participation.playerId
+          onParticipationsChange?.(
+            participations.map(p => {
+              if (p.seatId === updated.seatId) {
+                return updated
+              }
+              // ensure we don't have two participations with the same playerId
+              // the user will need to reassign a new player to the seat where the player was seated before
+              if (p.participation.playerId === player) {
+                return {
+                  ...p,
+                  participation: {
+                    ...p.participation,
+                    playerId: null,
+                  },
+                }
+              }
+              return p
+            }),
+          )
+        }
+        const modalId = modals.open({
+          title: "Edit Participation",
+          centered: true,
+          children: (
+            <EditParticipationModal
+              participation={participation}
+              onChange={onParticipationUpdate}
+              onClose={() => modals.close(modalId)}
+            />
+          ),
+        })
+      }
       return {
         element: (
           <PlayerAvatar
             key={participation.seatId}
             participation={participation.participation}
-            isWinner={winningPlayerIds?.includes(
-              participation.participation.playerId,
-            )}
+            isWinner={
+              participation.participation.playerId
+                ? winningPlayerIds?.includes(
+                    participation.participation.playerId,
+                  )
+                : false
+            }
             displayState={displayState}
             onClick={handleClick}
           />
