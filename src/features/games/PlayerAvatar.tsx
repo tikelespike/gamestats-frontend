@@ -66,13 +66,14 @@ const PlayerAvatar = ({
         <Skeleton width={"80px"} height={"15px"} />
       ) : (
         <Text size="sm" fw={500} ta="center">
-          {overrideText || participation?.playerId ? (
-            players.data
-              ?.find(p => p.id === participation?.playerId)
-              ?.name.split(" ")[0] + (isWinner ? " 🏆" : "")
-          ) : (
-            <i>Unknown Player</i>
-          )}
+          {overrideText ||
+            (participation?.playerId ? (
+              players.data
+                ?.find(p => p.id === participation?.playerId)
+                ?.name.split(" ")[0] + (isWinner ? " 🏆" : "")
+            ) : (
+              <i>Unknown Player</i>
+            ))}
         </Text>
       )}
     </Stack>
