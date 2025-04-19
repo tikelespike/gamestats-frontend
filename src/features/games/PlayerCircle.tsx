@@ -10,7 +10,8 @@ import styles from "./PlayerCircle.module.css"
 interface PlayerCircleProps {
   participations: PlayerParticipation[]
   winningPlayerIds?: number[]
-  onAddPlayer?: () => void
+  isEditing?: boolean
+  onParticipationsChange?: (participations: PlayerParticipation[]) => void
 }
 
 const calculatePosition = (
@@ -28,8 +29,9 @@ const calculatePosition = (
 
 const PlayerCircle: FC<PlayerCircleProps> = ({
   participations,
-  onAddPlayer,
   winningPlayerIds,
+  isEditing = false,
+  onParticipationsChange,
 }) => {
   const [displayState, setDisplayState] = useState<"initial" | "final">("final")
   const theme = useMantineTheme()
@@ -48,13 +50,13 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
       key: participation.playerId,
     }))
 
-  if (onAddPlayer) {
+  if (isEditing) {
     elements.unshift({
       element: (
         <PlayerAvatar
           key="add-player"
           overrideText="Add Player"
-          onClick={onAddPlayer}
+          onClick={() => {}}
           placeholder={<IconPlus size={"md"} />}
         />
       ),

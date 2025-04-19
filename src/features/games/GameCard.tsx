@@ -1,15 +1,15 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import {
   ActionIcon,
   Button,
   Card,
   Collapse,
   Group,
+  Select,
   Stack,
   Text,
   Textarea,
   TextInput,
-  Select,
   ThemeIcon,
   useMantineTheme,
 } from "@mantine/core"
@@ -23,7 +23,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
-import type { Game } from "../api/apiSlice"
+import type { Game, PlayerParticipation } from "../api/apiSlice"
 import {
   useEditGameMutation,
   usePlayersQuery,
@@ -45,6 +45,9 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const [isEditing, setIsEditing] = React.useState(false)
   const [editGame] = useEditGameMutation()
   const [editTriggered, setEditTriggered] = React.useState(false)
+  const [editedParticipations, setEditedParticipations] = useState<
+    PlayerParticipation[]
+  >(game.participants)
 
   const [opened, { open, toggle }] = useDisclosure(false)
   const scripts = useScriptsQuery()
@@ -234,14 +237,27 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             </ThemeIcon>
             {isEditing ? (
               <Select
-                data={scripts.data ? scripts.data.map(s => ({ value: s.id.toString(), label: s.name })) : []}
-                placeholder={scripts.isLoading ? "Loading scripts..." : "Select script"}
+                data={
+                  scripts.data
+                    ? scripts.data.map(s => ({
+                        value: s.id.toString(),
+                        label: s.name,
+                      }))
+                    : []
+                }
+                placeholder={
+                  scripts.isLoading ? "Loading scripts..." : "Select script"
+                }
                 disabled={scripts.isLoading || editTriggered}
                 {...form.getInputProps("scriptId")}
               />
             ) : (
               <Text>
-                {scripts.data ? scripts.data.find(s => s.id === game.scriptId)?.name : <i>Loading...</i>}
+                {scripts.data ? (
+                  scripts.data.find(s => s.id === game.scriptId)?.name
+                ) : (
+                  <i>Loading...</i>
+                )}
               </Text>
             )}
           </Group>
@@ -266,8 +282,12 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             </Text>
           )}
           <PlayerCircle
-            participations={game.participants}
+            participations={
+              isEditing ? editedParticipations : game.participants
+            }
             winningPlayerIds={game.winningPlayerIds}
+            isEditing={isEditing}
+            onParticipationsChange={setEditedParticipations}
           />
         </Stack>
       </Collapse>
