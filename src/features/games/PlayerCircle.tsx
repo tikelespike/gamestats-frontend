@@ -2,10 +2,12 @@ import type { ReactNode } from "react"
 import { type FC, useState } from "react"
 import PlayerAvatar from "./PlayerAvatar"
 import { IconPlus } from "@tabler/icons-react"
-import { PlayerParticipation } from "../api/apiSlice"
+import type { PlayerParticipation } from "../api/apiSlice"
 import { Box, Grid, SegmentedControl, useMantineTheme } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import styles from "./PlayerCircle.module.css"
+import { modals } from "@mantine/modals"
+import EditParticipationModal from "./EditParticipationModal"
 
 interface PlayerCircleProps {
   participations: PlayerParticipation[]
@@ -38,17 +40,41 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
 
   const elements: { element: ReactNode; key: number | string }[] =
-    participations.map(participation => ({
-      element: (
-        <PlayerAvatar
-          key={participation.playerId}
-          participation={participation}
-          isWinner={winningPlayerIds?.includes(participation.playerId)}
-          displayState={displayState}
-        />
-      ),
-      key: participation.playerId,
-    }))
+    participations.map(participation => {
+      const handleClick = isEditing
+        ? () => {
+            const modalId = modals.open({
+              title: "Edit Participation",
+              centered: true,
+              children: (
+                <EditParticipationModal
+                  participation={participation}
+                  onChange={updated =>
+                    onParticipationsChange?.(
+                      participations.map(p =>
+                        p.playerId === updated.playerId ? updated : p,
+                      ),
+                    )
+                  }
+                  onClose={() => modals.close(modalId)}
+                />
+              ),
+            })
+          }
+        : undefined
+      return {
+        element: (
+          <PlayerAvatar
+            key={participation.playerId}
+            participation={participation}
+            isWinner={winningPlayerIds?.includes(participation.playerId)}
+            displayState={displayState}
+            onClick={handleClick}
+          />
+        ),
+        key: participation.playerId,
+      }
+    })
 
   if (isEditing) {
     elements.unshift({
