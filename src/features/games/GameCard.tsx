@@ -9,6 +9,7 @@ import {
   Text,
   Textarea,
   TextInput,
+  Select,
   ThemeIcon,
   useMantineTheme,
 } from "@mantine/core"
@@ -66,6 +67,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     initialValues: {
       name: game.name,
       description: game.description || "",
+      scriptId: game.scriptId.toString(),
     },
     validate: {
       name: value => (value.trim().length > 0 ? null : "Game name is required"),
@@ -79,6 +81,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
         ...game,
         name: form.values.name,
         description: form.values.description || null,
+        scriptId: Number(form.values.scriptId),
       }).unwrap()
       notifications.show({
         title: "Success",
@@ -109,6 +112,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     form.setValues({
       name: game.name,
       description: game.description || "",
+      scriptId: game.scriptId.toString(),
     })
     open()
     setIsEditing(true)
@@ -228,13 +232,18 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             <ThemeIcon size="lg" variant="light">
               <IconScript style={{ width: "70%", height: "70%" }} />
             </ThemeIcon>
-            <Text>
-              {scripts.data ? (
-                scripts.data.find(s => s.id === game.scriptId)?.name
-              ) : (
-                <i>Loading...</i>
-              )}
-            </Text>
+            {isEditing ? (
+              <Select
+                data={scripts.data ? scripts.data.map(s => ({ value: s.id.toString(), label: s.name })) : []}
+                placeholder={scripts.isLoading ? "Loading scripts..." : "Select script"}
+                disabled={scripts.isLoading || editTriggered}
+                {...form.getInputProps("scriptId")}
+              />
+            ) : (
+              <Text>
+                {scripts.data ? scripts.data.find(s => s.id === game.scriptId)?.name : <i>Loading...</i>}
+              </Text>
+            )}
           </Group>
           <Group>
             <ThemeIcon size="lg" variant="light" color="yellow">
