@@ -1,7 +1,6 @@
 import { useForm } from "@mantine/form"
 import { Button, Checkbox, Grid, Group, Select } from "@mantine/core"
 import {
-  type Alignment,
   type PlayerParticipation,
   useCharactersQuery,
   usePlayersQuery,
@@ -21,12 +20,12 @@ const EditParticipationModal = ({
   const players = usePlayersQuery()
   const characters = useCharactersQuery()
 
-  const form = useForm({
+  const form = useForm<PlayerParticipation>({
     initialValues: {
-      playerId: participation.playerId.toString(),
-      initialCharacterId: participation.initialCharacterId.toString(),
+      playerId: participation.playerId,
+      initialCharacterId: participation.initialCharacterId,
       initialAlignment: participation.initialAlignment,
-      endCharacterId: participation.endCharacterId.toString(),
+      endCharacterId: participation.endCharacterId,
       endAlignment: participation.endAlignment,
       isAliveAtEnd: participation.isAliveAtEnd,
     },
@@ -41,13 +40,13 @@ const EditParticipationModal = ({
     { label: "Evil", value: "evil" },
   ]
 
-  const handleSubmit = (values: typeof form.values) => {
+  const handleSubmit = (values: PlayerParticipation) => {
     onChange({
-      playerId: Number(values.playerId),
-      initialCharacterId: Number(values.initialCharacterId),
-      initialAlignment: values.initialAlignment as Alignment,
-      endCharacterId: Number(values.endCharacterId),
-      endAlignment: values.endAlignment as Alignment,
+      playerId: values.playerId,
+      initialCharacterId: values.initialCharacterId,
+      initialAlignment: values.initialAlignment,
+      endCharacterId: values.endCharacterId,
+      endAlignment: values.endAlignment,
       isAliveAtEnd: values.isAliveAtEnd,
     })
     onClose()
