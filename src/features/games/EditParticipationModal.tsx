@@ -60,10 +60,12 @@ const EditParticipationModal = ({
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <Grid gutter="lg">
-        <Grid.Col span={6}>
+        <Grid.Col span={12}>
           <Select
             label="Player"
             data={playerOptions}
+            clearable
+            searchable
             {...form.getInputProps("playerId")}
           />
         </Grid.Col>
@@ -71,6 +73,8 @@ const EditParticipationModal = ({
           <Select
             label="Initial Character"
             data={characterOptions}
+            clearable
+            searchable
             {...form.getInputProps("initialCharacterId")}
           />
         </Grid.Col>
@@ -78,6 +82,7 @@ const EditParticipationModal = ({
           <Select
             label="Initial Alignment"
             data={alignmentOptions}
+            clearable
             {...form.getInputProps("initialAlignment")}
           />
         </Grid.Col>
@@ -85,6 +90,8 @@ const EditParticipationModal = ({
           <Select
             label="Final Character"
             data={characterOptions}
+            clearable
+            searchable
             {...form.getInputProps("endCharacterId")}
           />
         </Grid.Col>
@@ -92,10 +99,11 @@ const EditParticipationModal = ({
           <Select
             label="Final Alignment"
             data={alignmentOptions}
+            clearable
             {...form.getInputProps("endAlignment")}
           />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={12}>
           <Checkbox
             label="Alive at end"
             {...form.getInputProps("isAliveAtEnd", { type: "checkbox" })}
