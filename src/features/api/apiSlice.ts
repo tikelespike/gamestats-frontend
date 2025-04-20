@@ -22,6 +22,11 @@ export interface AddPlayerRequest {
   ownerId: number | null
 }
 
+export enum Alignment {
+  Good = "good",
+  Evil = "evil",
+}
+
 export enum CharacterType {
   Townsfolk = "townsfolk",
   Outsider = "outsider",
@@ -30,9 +35,21 @@ export enum CharacterType {
   Traveller = "traveller",
 }
 
-export enum Alignment {
-  Good = "good",
-  Evil = "evil",
+export namespace CharacterType {
+  export function getDefaultAlignment(type: CharacterType): Alignment | null {
+    switch (type) {
+      case CharacterType.Townsfolk:
+        return Alignment.Good
+      case CharacterType.Outsider:
+        return Alignment.Good
+      case CharacterType.Minion:
+        return Alignment.Evil
+      case CharacterType.Demon:
+        return Alignment.Evil
+      default:
+        return null
+    }
+  }
 }
 
 export interface Character {

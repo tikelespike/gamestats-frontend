@@ -2,6 +2,7 @@ import { useForm } from "@mantine/form"
 import { Button, Checkbox, Grid, Group, Select } from "@mantine/core"
 import {
   type Alignment,
+  CharacterType,
   useCharactersQuery,
   usePlayersQuery,
 } from "../api/apiSlice"
@@ -75,7 +76,35 @@ const EditParticipationModal = ({
             data={characterOptions}
             clearable
             searchable
-            {...form.getInputProps("initialCharacterId")}
+            onChange={value => {
+              form.setFieldValue("initialCharacterId", value ?? undefined)
+              if (characters.data) {
+                const character = characters.data.find(
+                  c => c.id.toString() === value,
+                )
+                if (character) {
+                  form.setFieldValue(
+                    "initialAlignment",
+                    CharacterType.getDefaultAlignment(character.type),
+                  )
+                }
+              }
+              if (!form.values.endCharacterId) {
+                form.setFieldValue("endCharacterId", value ?? undefined)
+                if (characters.data) {
+                  const character = characters.data.find(
+                    c => c.id.toString() === value,
+                  )
+                  if (character) {
+                    form.setFieldValue(
+                      "endAlignment",
+                      CharacterType.getDefaultAlignment(character.type),
+                    )
+                  }
+                }
+              }
+            }}
+            value={form.values.initialCharacterId}
           />
         </Grid.Col>
         <Grid.Col span={6}>
@@ -92,7 +121,21 @@ const EditParticipationModal = ({
             data={characterOptions}
             clearable
             searchable
-            {...form.getInputProps("endCharacterId")}
+            onChange={value => {
+              form.setFieldValue("endCharacterId", value ?? undefined)
+              if (characters.data) {
+                const character = characters.data.find(
+                  c => c.id.toString() === value,
+                )
+                if (character) {
+                  form.setFieldValue(
+                    "endAlignment",
+                    CharacterType.getDefaultAlignment(character.type),
+                  )
+                }
+              }
+            }}
+            value={form.values.endCharacterId}
           />
         </Grid.Col>
         <Grid.Col span={6}>
