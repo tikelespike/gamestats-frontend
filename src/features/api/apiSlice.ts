@@ -71,10 +71,10 @@ export interface AddScriptRequest {
 
 export interface PlayerParticipation {
   playerId: number | null
-  initialCharacterId: number
-  initialAlignment: Alignment
-  endCharacterId: number
-  endAlignment: Alignment
+  initialCharacterId: number | null
+  initialAlignment: Alignment | null
+  endCharacterId: number | null
+  endAlignment: Alignment | null
   isAliveAtEnd: boolean
 }
 
@@ -84,7 +84,7 @@ export interface Game {
   name: string
   description: string | null
   scriptId: number
-  winningAlignment: string
+  winningAlignment: string | null
   winningPlayerIds: number[]
   participants: PlayerParticipation[]
 }

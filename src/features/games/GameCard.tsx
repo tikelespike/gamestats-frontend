@@ -6,6 +6,7 @@ import {
   Card,
   Collapse,
   Group,
+  HoverCard,
   Select,
   Stack,
   Text,
@@ -16,6 +17,7 @@ import {
 } from "@mantine/core"
 import styles from "./GameManager.module.css"
 import {
+  IconAlertTriangle,
   IconChevronDown,
   IconChevronRight,
   IconCrown,
@@ -72,6 +74,15 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     if (!player) return "Unknown Player"
     return player?.name.split(" ")[0]
   })
+
+  const isIncomplete =
+    (game.winningAlignment === null && game.winningPlayerIds === null) ||
+    game.participants.some(
+      g =>
+        g.playerId === null ||
+        g.initialCharacterId === null ||
+        g.endCharacterId === null,
+    )
 
   const winnersJoined = winningNames.join(", ")
   const winnerTextAppendix = ` (${winnersJoined})`
@@ -169,6 +180,18 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             <Text fw={500} size="md">
               {truncate(game.name, isMobile ? 30 : 70)}
             </Text>
+          )}
+          {!isEditing && isIncomplete && (
+            <HoverCard shadow={"md"}>
+              <HoverCard.Target>
+                <ThemeIcon color={"yellow"} variant={"light"} size={"md"}>
+                  <IconAlertTriangle style={{ width: "70%", height: "70%" }} />
+                </ThemeIcon>
+              </HoverCard.Target>
+              <HoverCard.Dropdown>
+                <Text>Game data incomplete!</Text>
+              </HoverCard.Dropdown>
+            </HoverCard>
           )}
         </Group>
         {isEditing ? (

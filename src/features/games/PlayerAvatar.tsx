@@ -53,7 +53,12 @@ const PlayerAvatar = ({
           variant={"transparent"}
           data-alignment={alignment}
         >
-          {placeholder || <Skeleton circle width={"100%"} height={"100%"} />}
+          {placeholder ||
+            (characterId == null ? (
+              <></>
+            ) : (
+              <Skeleton circle width={"100%"} height={"100%"} />
+            ))}
         </Avatar>
         {displayState === "final" &&
           participation &&
