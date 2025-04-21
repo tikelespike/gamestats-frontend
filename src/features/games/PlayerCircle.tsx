@@ -8,6 +8,7 @@ import styles from "./PlayerCircle.module.css"
 import { modals } from "@mantine/modals"
 import EditParticipationModal from "./EditParticipationModal"
 import type { IndexedPlayerParticipation } from "./GameCard"
+import type { Script } from "../api/apiSlice"
 
 interface PlayerCircleProps {
   participations: IndexedPlayerParticipation[]
@@ -16,6 +17,7 @@ interface PlayerCircleProps {
   onParticipationsChange?: (
     participations: IndexedPlayerParticipation[],
   ) => void
+  script?: Script
 }
 
 const calculatePosition = (
@@ -36,6 +38,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
   winningPlayerIds,
   isEditing = false,
   onParticipationsChange,
+  script,
 }) => {
   const [displayState, setDisplayState] = useState<"initial" | "final">("final")
   const theme = useMantineTheme()
@@ -76,6 +79,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
               participation={participation}
               onChange={onParticipationUpdate}
               onClose={() => modals.close(modalId)}
+              script={script}
             />
           ),
         })

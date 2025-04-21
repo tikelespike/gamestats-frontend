@@ -26,7 +26,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
-import type { Game, PlayerParticipation } from "../api/apiSlice"
+import type { Game, PlayerParticipation, Script } from "../api/apiSlice"
 import {
   useEditGameMutation,
   usePlayersQuery,
@@ -147,6 +147,10 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     open()
     setIsEditing(true)
   }
+
+  const currentScript: Script | undefined = scripts.data?.find(
+    s => s.id === (isEditing ? Number(form.values.scriptId) : game.scriptId),
+  )
 
   return (
     <Card shadow={"lg"} px={"lg"} withBorder>
@@ -327,6 +331,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             winningPlayerIds={game.winningPlayerIds}
             isEditing={isEditing}
             onParticipationsChange={setEditedParticipations}
+            script={currentScript}
           />
         </Stack>
       </Collapse>

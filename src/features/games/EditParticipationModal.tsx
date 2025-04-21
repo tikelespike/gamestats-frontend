@@ -1,8 +1,10 @@
 import { useForm } from "@mantine/form"
 import { Button, Checkbox, Grid, Group, Select } from "@mantine/core"
+import React from "react"
 import {
   type Alignment,
   CharacterType,
+  type Script,
   useCharactersQuery,
   usePlayersQuery,
 } from "../api/apiSlice"
@@ -12,12 +14,22 @@ interface EditParticipationModalProps {
   participation: IndexedPlayerParticipation
   onChange: (updated: IndexedPlayerParticipation) => void
   onClose: () => void
+  script?: Script
 }
+
+const characterTypeOrder = [
+  CharacterType.Townsfolk,
+  CharacterType.Outsider,
+  CharacterType.Minion,
+  CharacterType.Demon,
+  CharacterType.Traveller,
+]
 
 const EditParticipationModal = ({
   participation: indexedParticipation,
   onChange,
   onClose,
+  script,
 }: EditParticipationModalProps) => {
   const players = usePlayersQuery()
   const characters = useCharactersQuery()
@@ -35,9 +47,55 @@ const EditParticipationModal = ({
   })
 
   const playerOptions =
-    players.data?.map(p => ({ value: p.id.toString(), label: p.name })) ?? []
-  const characterOptions =
-    characters.data?.map(c => ({ value: c.id.toString(), label: c.name })) ?? []
+    players.data
+      ?.toSorted((p1, p2) => p1.name.localeCompare(p2.name))
+      .map(p => ({
+        value: p.id.toString(),
+        label: p.name,
+      })) ?? []
+
+  const characterData = characters.data
+  const characterOptions = React.useMemo(() => {
+    if (!characterData) return []
+
+    const scriptCharacters = script
+      ? characterData.filter(c => script.characterIds.includes(c.id))
+      : []
+    const nonScriptCharacters = script
+      ? characterData.filter(c => !script.characterIds.includes(c.id))
+      : characterData
+
+    const sortCharacters = (chars: typeof characterData) => {
+      return chars.toSorted((a, b) => {
+        // First sort by character type order
+        const typeOrderDiff =
+          characterTypeOrder.indexOf(a.type) -
+          characterTypeOrder.indexOf(b.type)
+        if (typeOrderDiff !== 0) return typeOrderDiff
+        // Then sort alphabetically within the same type
+        return a.name.localeCompare(b.name)
+      })
+    }
+
+    const sortedScriptCharacters = sortCharacters(scriptCharacters)
+    const sortedNonScriptCharacters = sortCharacters(nonScriptCharacters)
+
+    const scriptOptions = sortedScriptCharacters.map(c => ({
+      value: c.id.toString(),
+      label: c.name,
+    }))
+
+    const nonScriptOptions = sortedNonScriptCharacters.map(c => ({
+      value: c.id.toString(),
+      label: c.name,
+    }))
+
+    return [
+      { group: "From Script", items: scriptOptions },
+      { group: "Other", items: nonScriptOptions },
+    ]
+  }, [characterData, script])
+
   const alignmentOptions = [
     { label: "Good", value: "good" },
     { label: "Evil", value: "evil" },
