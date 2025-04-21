@@ -67,7 +67,10 @@ const EditParticipationModal = ({
             data={playerOptions}
             clearable
             searchable
-            {...form.getInputProps("playerId")}
+            onChange={value =>
+              form.setFieldValue("playerId", value ?? undefined)
+            }
+            value={form.values.playerId}
           />
         </Grid.Col>
         <Grid.Col span={6}>
