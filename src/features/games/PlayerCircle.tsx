@@ -71,6 +71,13 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
             }),
           )
         }
+
+        const onParticipationDelete = (seatId: number) => {
+          onParticipationsChange?.(
+            participations.filter(p => p.seatId !== seatId)
+          )
+        }
+
         const modalId = modals.open({
           title: "Edit Participation",
           centered: true,
@@ -78,6 +85,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
             <EditParticipationModal
               participation={participation}
               onChange={onParticipationUpdate}
+              onDelete={onParticipationDelete}
               onClose={() => modals.close(modalId)}
               script={script}
             />

@@ -1,5 +1,5 @@
 import { useForm } from "@mantine/form"
-import { Button, Checkbox, Grid, Group, Select } from "@mantine/core"
+import { Button, Checkbox, Grid, Select } from "@mantine/core"
 import React from "react"
 import {
   type Alignment,
@@ -13,6 +13,7 @@ import type { IndexedPlayerParticipation } from "./GameCard"
 interface EditParticipationModalProps {
   participation: IndexedPlayerParticipation
   onChange: (updated: IndexedPlayerParticipation) => void
+  onDelete: (seatId: number) => void
   onClose: () => void
   script?: Script
 }
@@ -28,6 +29,7 @@ const characterTypeOrder = [
 const EditParticipationModal = ({
   participation: indexedParticipation,
   onChange,
+  onDelete,
   onClose,
   script,
 }: EditParticipationModalProps) => {
@@ -213,14 +215,26 @@ const EditParticipationModal = ({
             {...form.getInputProps("isAliveAtEnd", { type: "checkbox" })}
           />
         </Grid.Col>
-      </Grid>
 
-      <Group justify="flex-end" mt="xl">
-        <Button variant="default" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit">Save</Button>
-      </Group>
+        <Grid.Col span={{ base: 12, xs: 6 }}>
+          <Button
+            fullWidth
+            color="red"
+            variant="outline"
+            onClick={() => {
+              onDelete(indexedParticipation.seatId)
+              onClose()
+            }}
+          >
+            Remove Player
+          </Button>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, xs: 6 }}>
+          <Button fullWidth type="submit">
+            Save
+          </Button>
+        </Grid.Col>
+      </Grid>
     </form>
   )
 }
