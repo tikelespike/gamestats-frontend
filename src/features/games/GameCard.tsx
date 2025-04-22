@@ -65,6 +65,27 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const [editedParticipations, setEditedParticipations] =
     useState<IndexedPlayerParticipation[]>(indexedParticipants)
 
+  const cleanupCustomWinners: (
+    newParticipations: IndexedPlayerParticipation[],
+  ) => void = newParticipations => {
+    if (form.values.winningAlignment === null) {
+      const validWinners = form.values.winningPlayerIds.filter(winnerId =>
+        newParticipations.some(p => p.participation.playerId === winnerId),
+      )
+
+      if (validWinners.length !== form.values.winningPlayerIds.length) {
+        form.setFieldValue("winningPlayerIds", validWinners)
+      }
+    }
+  }
+
+  const handleParticipationsChange = (
+    newParticipations: IndexedPlayerParticipation[],
+  ) => {
+    setEditedParticipations(newParticipations)
+    cleanupCustomWinners(newParticipations)
+  }
+
   const [opened, { open, toggle }] = useDisclosure(false)
   const scripts = useScriptsQuery()
   const players = usePlayersQuery()
@@ -398,7 +419,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             }
             winningPlayerIds={game.winningPlayerIds}
             isEditing={isEditing}
-            onParticipationsChange={setEditedParticipations}
+            onParticipationsChange={handleParticipationsChange}
             script={currentScript}
           />
         </Stack>
