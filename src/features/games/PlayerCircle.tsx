@@ -74,7 +74,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
 
         const onParticipationDelete = (seatId: number) => {
           onParticipationsChange?.(
-            participations.filter(p => p.seatId !== seatId)
+            participations.filter(p => p.seatId !== seatId),
           )
         }
 
@@ -118,7 +118,26 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
         <PlayerAvatar
           key="add-player"
           overrideText="Add Player"
-          onClick={() => {}}
+          onClick={() => {
+            const maxSeatId = participations.reduce(
+              (max, p) => Math.max(max, p.seatId),
+              0,
+            )
+
+            const newParticipation: IndexedPlayerParticipation = {
+              seatId: maxSeatId + 1,
+              participation: {
+                playerId: null,
+                initialCharacterId: null,
+                initialAlignment: null,
+                endCharacterId: null,
+                endAlignment: null,
+                isAliveAtEnd: true,
+              },
+            }
+
+            onParticipationsChange?.([...participations, newParticipation])
+          }}
           placeholder={<IconPlus size={"md"} />}
         />
       ),
