@@ -25,7 +25,7 @@ const calculatePosition = (
   totalPlayers: number,
   radius: number,
 ): { x: number; y: number } => {
-  const angle = (index / totalPlayers) * 2 * Math.PI + Math.PI / 2
+  const angle = (index / totalPlayers) * 2 * Math.PI - Math.PI / 2
 
   const x = radius + radius * Math.cos(angle)
   const y = radius + radius * Math.sin(angle)
