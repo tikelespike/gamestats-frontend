@@ -198,232 +198,248 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
       }))
   }, [players.data, editedParticipations])
 
-  return (
-    <Card shadow={"lg"} px={"lg"} withBorder>
-      <Group
-        className={styles.titleBar}
-        onClick={!isEditing ? toggle : undefined}
-        role="button"
-        tabIndex={0}
-        onKeyDown={e => !isEditing && e.key === "Enter" && toggle()}
-        justify="space-between"
-        wrap="nowrap"
-      >
-        <Group style={{ flex: 1 }} wrap="nowrap">
-          {!isEditing &&
-            (opened ? (
-              <IconChevronDown size="1.2rem" />
-            ) : (
-              <IconChevronRight size="1.2rem" />
-            ))}
-          {isEditing ? (
-            <TextInput
-              placeholder="Game name"
-              {...form.getInputProps("name")}
-              onClick={e => e.stopPropagation()}
-              size="sm"
-              w="100%"
-              maw={500}
-              disabled={editTriggered}
-            />
-          ) : (
-            <Text fw={500} size="md">
-              {truncate(game.name, isMobile ? 30 : 70)}
-            </Text>
-          )}
-          {!isEditing && isIncomplete && (
-            <HoverCard shadow={"md"}>
-              <HoverCard.Target>
-                <ThemeIcon color={"yellow"} variant={"light"} size={"md"}>
-                  <IconAlertTriangle style={{ width: "70%", height: "70%" }} />
-                </ThemeIcon>
-              </HoverCard.Target>
-              <HoverCard.Dropdown>
-                <Text>Game data incomplete!</Text>
-              </HoverCard.Dropdown>
-            </HoverCard>
-          )}
-        </Group>
-        {isEditing ? (
-          <Group gap="xs">
+  const gameNameComponent = isEditing ? (
+    <TextInput
+      placeholder="Game name"
+      {...form.getInputProps("name")}
+      onClick={e => e.stopPropagation()}
+      size="sm"
+      w="100%"
+      maw={500}
+      disabled={editTriggered}
+    />
+  ) : (
+    <Text fw={500} size="md">
+      {truncate(game.name, isMobile ? 30 : 70)}
+    </Text>
+  )
+  const incompleteGameWarning = (
+    <>
+      <HoverCard shadow={"md"}>
+        <HoverCard.Target>
+          <ThemeIcon color={"yellow"} variant={"light"} size={"md"}>
+            <IconAlertTriangle style={{ width: "70%", height: "70%" }} />
+          </ThemeIcon>
+        </HoverCard.Target>
+        <HoverCard.Dropdown>
+          <Text>Game data incomplete!</Text>
+        </HoverCard.Dropdown>
+      </HoverCard>
+    </>
+  )
+  const editButtons = (
+    <>
+      <Group gap="xs">
+        <Button
+          variant="subtle"
+          color="gray"
+          onClick={handleCancel}
+          size="xs"
+          disabled={editTriggered}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSave}
+          size="xs"
+          disabled={!form.isValid() || editTriggered}
+          loading={editTriggered}
+        >
+          Save
+        </Button>
+      </Group>
+    </>
+  )
+  const cardHeaderButtons = (
+    <>
+      <Group gap="xs">
+        {!isMobile ? (
+          <>
             <Button
               variant="subtle"
-              color="gray"
-              onClick={handleCancel}
+              color="blue"
+              leftSection={<IconEdit size={16} />}
+              onClick={handleEditClick}
               size="xs"
-              disabled={editTriggered}
             >
-              Cancel
+              Edit
             </Button>
-            <Button
-              onClick={handleSave}
-              size="xs"
-              disabled={!form.isValid() || editTriggered}
-              loading={editTriggered}
-            >
-              Save
-            </Button>
-          </Group>
-        ) : (
-          <Group gap="xs">
-            {!isMobile ? (
-              <>
-                <Button
-                  variant="subtle"
-                  color="blue"
-                  leftSection={<IconEdit size={16} />}
-                  onClick={handleEditClick}
-                  size="xs"
-                >
-                  Edit
-                </Button>
-                {onDelete && (
-                  <Button
-                    variant="subtle"
-                    color="red"
-                    leftSection={<IconTrash size={16} />}
-                    onClick={e => {
-                      e.stopPropagation()
-                      onDelete()
-                    }}
-                    size="xs"
-                  >
-                    Delete
-                  </Button>
-                )}
-              </>
-            ) : (
-              <>
-                <ActionIcon
-                  variant="subtle"
-                  color="blue"
-                  onClick={handleEditClick}
-                >
-                  <IconEdit size={16} />
-                </ActionIcon>
-                {onDelete && (
-                  <ActionIcon
-                    variant="subtle"
-                    color="red"
-                    onClick={e => {
-                      e.stopPropagation()
-                      onDelete()
-                    }}
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                )}
-              </>
+            {onDelete && (
+              <Button
+                variant="subtle"
+                color="red"
+                leftSection={<IconTrash size={16} />}
+                onClick={e => {
+                  e.stopPropagation()
+                  onDelete()
+                }}
+                size="xs"
+              >
+                Delete
+              </Button>
             )}
-          </Group>
+          </>
+        ) : (
+          <>
+            <ActionIcon variant="subtle" color="blue" onClick={handleEditClick}>
+              <IconEdit size={16} />
+            </ActionIcon>
+            {onDelete && (
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                onClick={e => {
+                  e.stopPropagation()
+                  onDelete()
+                }}
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+            )}
+          </>
         )}
       </Group>
-      <Collapse in={opened}>
-        <Stack pt={"xl"}>
-          <Group>
-            <ThemeIcon size="lg" variant="light">
-              <IconScript style={{ width: "70%", height: "70%" }} />
-            </ThemeIcon>
-            {isEditing ? (
-              <Select
-                data={
-                  scripts.data
-                    ? scripts.data.map(s => ({
-                        value: s.id.toString(),
-                        label: s.name,
-                      }))
-                    : []
-                }
-                placeholder={
-                  scripts.isLoading ? "Loading scripts..." : "Select script"
-                }
-                disabled={scripts.isLoading || editTriggered}
-                {...form.getInputProps("scriptId")}
-              />
-            ) : (
-              <Text>
-                {scripts.data ? (
-                  scripts.data.find(s => s.id === game.scriptId)?.name
-                ) : (
-                  <i>Loading...</i>
-                )}
-              </Text>
-            )}
-          </Group>
-          <Group>
-            <ThemeIcon size="lg" variant="light" color="yellow">
-              <IconCrown style={{ width: "70%", height: "70%" }} />
-            </ThemeIcon>
-            {isEditing ? (
-              <Group gap="sm">
-                <Select
-                  data={winningTeamOptions}
-                  disabled={editTriggered}
-                  value={
-                    form.values.winningAlignment === null
-                      ? "custom"
-                      : form.values.winningAlignment
-                  }
-                  onChange={value => {
-                    if (value === "custom") {
-                      form.setFieldValue("winningAlignment", null)
-                    } else {
-                      form.setFieldValue("winningAlignment", value)
-                      // When selecting a team alignment, automatically select all players of that alignment
-                      const winningPlayers = editedParticipations
-                        .filter(p => p.participation.endAlignment === value)
-                        .map(p => p.participation.playerId)
-                        .filter((id): id is number => id !== null)
-                      form.setFieldValue("winningPlayerIds", winningPlayers)
-                    }
-                  }}
-                />
-                {form.values.winningAlignment === null && (
-                  <MultiSelect
-                    data={playerSelectOptions}
-                    disabled={editTriggered}
-                    value={form.values.winningPlayerIds.map(id =>
-                      id.toString(),
-                    )}
-                    onChange={values => {
-                      form.setFieldValue(
-                        "winningPlayerIds",
-                        values.map(v => parseInt(v)),
-                      )
-                    }}
-                    placeholder="Select winners"
-                  />
-                )}
-              </Group>
-            ) : (
-              <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
-            )}
-          </Group>
-          {isEditing ? (
-            <Textarea
-              placeholder="Game description"
-              {...form.getInputProps("description")}
-              size="sm"
-              autosize
-              maxRows={16}
-              disabled={editTriggered}
-            />
+    </>
+  )
+  const cardHeader = (
+    <Group
+      className={styles.titleBar}
+      onClick={!isEditing ? toggle : undefined}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => !isEditing && e.key === "Enter" && toggle()}
+      justify="space-between"
+      wrap="nowrap"
+    >
+      <Group style={{ flex: 1 }} wrap="nowrap">
+        {!isEditing &&
+          (opened ? (
+            <IconChevronDown size="1.2rem" />
           ) : (
-            <Text mb={"md"} c={"dimmed"}>
-              {game.description}
-            </Text>
+            <IconChevronRight size="1.2rem" />
+          ))}
+        {gameNameComponent}
+        {!isEditing && isIncomplete && incompleteGameWarning}
+      </Group>
+      {isEditing ? editButtons : cardHeaderButtons}
+    </Group>
+  )
+
+  const gameScriptComponent = (
+    <Group>
+      <ThemeIcon size="lg" variant="light">
+        <IconScript style={{ width: "70%", height: "70%" }} />
+      </ThemeIcon>
+      {isEditing ? (
+        <Select
+          data={
+            scripts.data
+              ? scripts.data.map(s => ({
+                  value: s.id.toString(),
+                  label: s.name,
+                }))
+              : []
+          }
+          placeholder={
+            scripts.isLoading ? "Loading scripts..." : "Select script"
+          }
+          disabled={scripts.isLoading || editTriggered}
+          {...form.getInputProps("scriptId")}
+        />
+      ) : (
+        <Text>
+          {scripts.data ? (
+            scripts.data.find(s => s.id === game.scriptId)?.name
+          ) : (
+            <i>Loading...</i>
           )}
-          <PlayerCircle
-            participations={
-              isEditing ? editedParticipations : indexedParticipants
+        </Text>
+      )}
+    </Group>
+  )
+  const gameWinnersComponent = (
+    <Group>
+      <ThemeIcon size="lg" variant="light" color="yellow">
+        <IconCrown style={{ width: "70%", height: "70%" }} />
+      </ThemeIcon>
+      {isEditing ? (
+        <>
+          <Select
+            data={winningTeamOptions}
+            disabled={editTriggered}
+            value={
+              form.values.winningAlignment === null
+                ? "custom"
+                : form.values.winningAlignment
             }
-            winningPlayerIds={game.winningPlayerIds}
-            isEditing={isEditing}
-            onParticipationsChange={handleParticipationsChange}
-            script={currentScript}
+            onChange={value => {
+              if (value === "custom") {
+                form.setFieldValue("winningAlignment", null)
+              } else {
+                form.setFieldValue("winningAlignment", value)
+                // When selecting a team alignment, automatically select all players of that alignment
+                const winningPlayers = editedParticipations
+                  .filter(p => p.participation.endAlignment === value)
+                  .map(p => p.participation.playerId)
+                  .filter((id): id is number => id !== null)
+                form.setFieldValue("winningPlayerIds", winningPlayers)
+              }
+            }}
           />
-        </Stack>
-      </Collapse>
+          {form.values.winningAlignment === null && (
+            <MultiSelect
+              data={playerSelectOptions}
+              disabled={editTriggered}
+              value={form.values.winningPlayerIds.map(id => id.toString())}
+              onChange={values => {
+                form.setFieldValue(
+                  "winningPlayerIds",
+                  values.map(v => parseInt(v)),
+                )
+              }}
+              placeholder="Select winners"
+            />
+          )}
+        </>
+      ) : (
+        <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
+      )}
+    </Group>
+  )
+  const gameDescriptionComponent = isEditing ? (
+    <Textarea
+      placeholder="Game description"
+      {...form.getInputProps("description")}
+      size="sm"
+      autosize
+      maxRows={16}
+      disabled={editTriggered}
+    />
+  ) : (
+    <Text mb={"md"} c={"dimmed"}>
+      {game.description}
+    </Text>
+  )
+
+  const cardBody = (
+    <Stack pt={"xl"}>
+      {gameScriptComponent}
+      {gameWinnersComponent}
+      {gameDescriptionComponent}
+      <PlayerCircle
+        participations={isEditing ? editedParticipations : indexedParticipants}
+        winningPlayerIds={game.winningPlayerIds}
+        isEditing={isEditing}
+        onParticipationsChange={handleParticipationsChange}
+        script={currentScript}
+      />
+    </Stack>
+  )
+
+  return (
+    <Card shadow={"lg"} px={"lg"} withBorder>
+      {cardHeader}
+      <Collapse in={opened}>{cardBody}</Collapse>
     </Card>
   )
 }
