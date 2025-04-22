@@ -104,17 +104,24 @@ const EditParticipationModal = ({
   ]
 
   const handleSubmit = (values: typeof form.values) => {
-    onChange({
+    const updatedParticipation = {
       seatId: indexedParticipation.seatId,
       participation: {
-        playerId: Number(values.playerId),
-        initialCharacterId: Number(values.initialCharacterId),
+        playerId: isNaN(Number(values.playerId))
+          ? null
+          : Number(values.playerId),
+        initialCharacterId: isNaN(Number(values.initialCharacterId))
+          ? null
+          : Number(values.initialCharacterId),
         initialAlignment: values.initialAlignment as Alignment,
-        endCharacterId: Number(values.endCharacterId),
+        endCharacterId: isNaN(Number(values.endCharacterId))
+          ? null
+          : Number(values.endCharacterId),
         endAlignment: values.endAlignment as Alignment,
         isAliveAtEnd: values.isAliveAtEnd,
       },
-    })
+    }
+    onChange(updatedParticipation)
     onClose()
   }
 
