@@ -7,6 +7,7 @@ import {
   Collapse,
   Group,
   HoverCard,
+  MultiSelect,
   Select,
   Stack,
   Text,
@@ -93,8 +94,10 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const form = useForm({
     initialValues: {
       name: game.name,
-      description: game.description || "",
-      scriptId: game.scriptId.toString(),
+      description: game.description ?? "",
+      scriptId: game.scriptId?.toString(),
+      winningAlignment: game.winningAlignment,
+      winningPlayerIds: game.winningPlayerIds,
     },
     validate: {
       name: value => (value.trim().length > 0 ? null : "Game name is required"),
@@ -111,6 +114,8 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
         scriptId: Number(form.values.scriptId),
         // use new order of list as new order of participations, throwing away the old order which was used as keys
         participants: editedParticipations.map(p => p.participation),
+        winningAlignment: form.values.winningAlignment,
+        winningPlayerIds: form.values.winningPlayerIds,
       }).unwrap()
       notifications.show({
         title: "Success",
@@ -141,7 +146,9 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     form.setValues({
       name: game.name,
       description: game.description || "",
-      scriptId: game.scriptId.toString(),
+      scriptId: game.scriptId?.toString(),
+      winningAlignment: game.winningAlignment,
+      winningPlayerIds: game.winningPlayerIds,
     })
     setEditedParticipations(indexedParticipants)
     open()
@@ -151,6 +158,24 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   const currentScript: Script | undefined = scripts.data?.find(
     s => s.id === (isEditing ? Number(form.values.scriptId) : game.scriptId),
   )
+
+  const winningTeamOptions = [
+    { label: "Good Team", value: "good" },
+    { label: "Evil Team", value: "evil" },
+    { label: "Custom", value: "custom" },
+  ]
+
+  const playerSelectOptions = React.useMemo(() => {
+    if (!players.data) return []
+    return players.data
+      .filter(p =>
+        editedParticipations.some(part => part.participation.playerId === p.id),
+      )
+      .map(p => ({
+        value: p.id.toString(),
+        label: p.name.split(" ")[0],
+      }))
+  }, [players.data, editedParticipations])
 
   return (
     <Card shadow={"lg"} px={"lg"} withBorder>
@@ -273,7 +298,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
         )}
       </Group>
       <Collapse in={opened}>
-        <Stack maw={"800px"} pt={"xl"}>
+        <Stack pt={"xl"}>
           <Group>
             <ThemeIcon size="lg" variant="light">
               <IconScript style={{ width: "70%", height: "70%" }} />
@@ -308,7 +333,50 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             <ThemeIcon size="lg" variant="light" color="yellow">
               <IconCrown style={{ width: "70%", height: "70%" }} />
             </ThemeIcon>
-            <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
+            {isEditing ? (
+              <Group gap="sm">
+                <Select
+                  data={winningTeamOptions}
+                  disabled={editTriggered}
+                  value={
+                    form.values.winningAlignment === null
+                      ? "custom"
+                      : form.values.winningAlignment
+                  }
+                  onChange={value => {
+                    if (value === "custom") {
+                      form.setFieldValue("winningAlignment", null)
+                    } else {
+                      form.setFieldValue("winningAlignment", value)
+                      // When selecting a team alignment, automatically select all players of that alignment
+                      const winningPlayers = editedParticipations
+                        .filter(p => p.participation.endAlignment === value)
+                        .map(p => p.participation.playerId)
+                        .filter((id): id is number => id !== null)
+                      form.setFieldValue("winningPlayerIds", winningPlayers)
+                    }
+                  }}
+                />
+                {form.values.winningAlignment === null && (
+                  <MultiSelect
+                    data={playerSelectOptions}
+                    disabled={editTriggered}
+                    value={form.values.winningPlayerIds.map(id =>
+                      id.toString(),
+                    )}
+                    onChange={values => {
+                      form.setFieldValue(
+                        "winningPlayerIds",
+                        values.map(v => parseInt(v)),
+                      )
+                    }}
+                    placeholder="Select winners"
+                  />
+                )}
+              </Group>
+            ) : (
+              <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
+            )}
           </Group>
           {isEditing ? (
             <Textarea
