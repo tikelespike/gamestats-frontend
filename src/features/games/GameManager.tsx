@@ -65,13 +65,15 @@ const GameManager = () => {
           onCreateSuccess={handleCreateSuccess}
         />
       )}
-      {games.data.map(game => (
-        <GameCard
-          key={game.id}
-          game={game}
-          onDelete={() => handleDeleteGame(game.id)}
-        />
-      ))}
+      {games.data
+        .toSorted((g1, g2) => g2.id - g1.id) // newest games on top
+        .map(game => (
+          <GameCard
+            key={game.id}
+            game={game}
+            onDelete={() => handleDeleteGame(game.id)}
+          />
+        ))}
     </Stack>
   )
 }

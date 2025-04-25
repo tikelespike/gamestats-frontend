@@ -124,15 +124,12 @@ const GameCard: FC<GameCardProps> = ({
     return player?.name.split(" ")[0]
   })
 
-  const isIncomplete =
-    (initialGame.winningAlignment === null &&
-      initialGame.winningPlayerIds === null) ||
-    initialGame.participants.some(
-      g =>
-        g.playerId === null ||
-        g.initialCharacterId === null ||
-        g.endCharacterId === null,
-    )
+  const isIncomplete = initialGame.participants.some(
+    g =>
+      g.playerId === null ||
+      g.initialCharacterId === null ||
+      g.endCharacterId === null,
+  )
 
   const winnersJoined = winningNames.join(", ")
   const winnerTextAppendix = ` (${winnersJoined})`
