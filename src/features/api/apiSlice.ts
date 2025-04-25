@@ -145,7 +145,7 @@ export const apiSlice = createApi({
         url: `/players/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Players"],
+      invalidatesTags: ["Players", "Games"],
     }),
     characters: builder.query<Character[], void>({
       query: () => "/characters",
@@ -239,6 +239,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Games"],
     }),
+    createGame: builder.mutation<Game, Omit<Game, "id" | "version">>({
+      query: request => ({
+        url: "/games",
+        method: "POST",
+        body: request,
+      }),
+      invalidatesTags: ["Games"],
+    }),
   }),
 })
 
@@ -261,4 +269,5 @@ export const {
   useGamesQuery,
   useDeleteGameMutation,
   useEditGameMutation,
+  useCreateGameMutation,
 } = apiSlice

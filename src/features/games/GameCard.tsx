@@ -27,8 +27,12 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
-import type { Game, PlayerParticipation, Script } from "../api/apiSlice"
 import {
+  Alignment,
+  Game,
+  PlayerParticipation,
+  Script,
+  useCreateGameMutation,
   useEditGameMutation,
   usePlayersQuery,
   useScriptsQuery,
@@ -44,21 +48,40 @@ export interface IndexedPlayerParticipation {
 }
 
 interface GameCardProps {
-  game: Game
+  game?: Game
   onDelete?: () => void
+  isNew?: boolean
 }
 
-const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
+const GameCard: FC<GameCardProps> = ({
+  game,
+  onDelete,
+  isNew = false,
+}: GameCardProps) => {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
-  const [isEditing, setIsEditing] = React.useState(false)
+  const [isEditing, setIsEditing] = React.useState(isNew)
   const [editGame] = useEditGameMutation()
+  const [createGame] = useCreateGameMutation()
   const [editTriggered, setEditTriggered] = React.useState(false)
+
+  // For new games, create an empty game object
+  const initialGame: Game = game ?? {
+    id: -1,
+    version: 0,
+    name: "",
+    description: null,
+    scriptId: -1,
+    winningAlignment: Alignment.Good,
+    winningPlayerIds: [],
+    participants: [],
+  }
+
   // "freeze" the indices of the participations so we can use them as keys from here on
   // out, even if the order changes. The intuition is that we are placing them on seats in a circle.
   // We can move each circle around or change the player and its data on the seat, but it's the same seat.
   const indexedParticipants: IndexedPlayerParticipation[] =
-    game.participants.map((participation, index) => ({
+    initialGame.participants.map((participation, index) => ({
       participation,
       seatId: index,
     }))
@@ -86,10 +109,10 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     cleanupCustomWinners(newParticipations)
   }
 
-  const [opened, { open, toggle }] = useDisclosure(false)
+  const [opened, { open, toggle }] = useDisclosure(isNew)
   const scripts = useScriptsQuery()
   const players = usePlayersQuery()
-  const winningNames = game.winningPlayerIds.map(id => {
+  const winningNames = initialGame.winningPlayerIds.map(id => {
     if (!players.data) return "Loading name..."
 
     const player = players.data.find(p => p.id === id)
@@ -98,8 +121,9 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   })
 
   const isIncomplete =
-    (game.winningAlignment === null && game.winningPlayerIds === null) ||
-    game.participants.some(
+    (initialGame.winningAlignment === null &&
+      initialGame.winningPlayerIds === null) ||
+    initialGame.participants.some(
       g =>
         g.playerId === null ||
         g.initialCharacterId === null ||
@@ -108,56 +132,71 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
 
   const winnersJoined = winningNames.join(", ")
   const winnerTextAppendix = ` (${winnersJoined})`
-  const winnersText = game.winningAlignment
-    ? `${game.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
+  const winnersText = initialGame.winningAlignment
+    ? `${initialGame.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
     : winnersJoined
 
   const form = useForm({
     initialValues: {
-      name: game.name,
-      description: game.description ?? "",
-      scriptId: game.scriptId?.toString(),
-      winningAlignment: game.winningAlignment,
-      winningPlayerIds: game.winningPlayerIds,
+      name: initialGame.name,
+      description: initialGame.description ?? "",
+      scriptId: initialGame.scriptId?.toString(),
+      winningAlignment: initialGame.winningAlignment,
+      winningPlayerIds: initialGame.winningPlayerIds,
     },
     validate: {
       name: value => (value.trim().length > 0 ? null : "Game name is required"),
+      scriptId: value => (value ? null : "Script is required"),
     },
   })
 
   const handleSave = async () => {
     setEditTriggered(true)
+    const gameData = {
+      name: form.values.name,
+      description: form.values.description || null,
+      scriptId: Number(form.values.scriptId),
+      // use new order of list as new order of participations, throwing away the old order which was used as keys
+      participants: editedParticipations.map(p => p.participation),
+      winningAlignment: form.values.winningAlignment,
+      winningPlayerIds: form.values.winningPlayerIds,
+    }
     try {
-      await editGame({
-        ...game,
-        name: form.values.name,
-        description: form.values.description || null,
-        scriptId: Number(form.values.scriptId),
-        // use new order of list as new order of participations, throwing away the old order which was used as keys
-        participants: editedParticipations.map(p => p.participation),
-        winningAlignment: form.values.winningAlignment,
-        winningPlayerIds: form.values.winningPlayerIds,
-      }).unwrap()
-      notifications.show({
-        title: "Success",
-        message: "Game updated successfully",
-        color: "green",
-      })
-      setIsEditing(false)
+      if (isNew) {
+        await createGame(gameData).unwrap()
+        notifications.show({
+          title: "Success",
+          message: "Game created successfully",
+          color: "green",
+        })
+      } else {
+        await editGame({
+          ...gameData,
+          id: initialGame.id,
+          version: initialGame.version,
+        }).unwrap()
+        notifications.show({
+          title: "Success",
+          message: "Game updated successfully",
+          color: "green",
+        })
+      }
     } catch (error) {
       notifications.show({
         title: "Error",
-        message: "Failed to update game. Please try again.",
+        message: `Failed to ${isNew ? "create" : "update"} game. Please try again.`,
         color: "red",
       })
-    } finally {
-      setEditTriggered(false)
+      return
     }
+    setIsEditing(false)
+    setEditTriggered(false)
   }
 
   const handleCancel = () => {
     form.reset()
     setIsEditing(false)
+    setEditedParticipations(indexedParticipants)
   }
 
   const handleEditClick: (
@@ -165,11 +204,11 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   ) => void = e => {
     e.stopPropagation()
     form.setValues({
-      name: game.name,
-      description: game.description || "",
-      scriptId: game.scriptId?.toString(),
-      winningAlignment: game.winningAlignment,
-      winningPlayerIds: game.winningPlayerIds,
+      name: initialGame.name,
+      description: initialGame.description || "",
+      scriptId: initialGame.scriptId?.toString(),
+      winningAlignment: initialGame.winningAlignment,
+      winningPlayerIds: initialGame.winningPlayerIds,
     })
     setEditedParticipations(indexedParticipants)
     open()
@@ -177,7 +216,9 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
   }
 
   const currentScript: Script | undefined = scripts.data?.find(
-    s => s.id === (isEditing ? Number(form.values.scriptId) : game.scriptId),
+    s =>
+      s.id ===
+      (isEditing ? Number(form.values.scriptId) : initialGame.scriptId),
   )
 
   const winningTeamOptions = [
@@ -210,7 +251,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     />
   ) : (
     <Text fw={500} size="md">
-      {truncate(game.name, isMobile ? 30 : 70)}
+      {truncate(initialGame.name || "New Game", isMobile ? 30 : 70)}
     </Text>
   )
   const incompleteGameWarning = (
@@ -245,7 +286,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
           disabled={!form.isValid() || editTriggered}
           loading={editTriggered}
         >
-          Save
+          {isNew ? "Create" : "Save"}
         </Button>
       </Group>
     </>
@@ -319,7 +360,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
             <IconChevronRight size="1.2rem" />
           ))}
         {gameNameComponent}
-        {!isEditing && isIncomplete && incompleteGameWarning}
+        {!isEditing && !isNew && isIncomplete && incompleteGameWarning}
       </Group>
       {isEditing ? editButtons : cardHeaderButtons}
     </Group>
@@ -349,7 +390,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
       ) : (
         <Text>
           {scripts.data ? (
-            scripts.data.find(s => s.id === game.scriptId)?.name
+            scripts.data.find(s => s.id === initialGame.scriptId)?.name
           ) : (
             <i>Loading...</i>
           )}
@@ -417,7 +458,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
     />
   ) : (
     <Text mb={"md"} c={"dimmed"}>
-      {game.description}
+      {initialGame.description}
     </Text>
   )
 
@@ -428,7 +469,7 @@ const GameCard: FC<GameCardProps> = ({ game, onDelete }: GameCardProps) => {
       {gameDescriptionComponent}
       <PlayerCircle
         participations={isEditing ? editedParticipations : indexedParticipants}
-        winningPlayerIds={game.winningPlayerIds}
+        winningPlayerIds={initialGame.winningPlayerIds}
         isEditing={isEditing}
         onParticipationsChange={handleParticipationsChange}
         script={currentScript}

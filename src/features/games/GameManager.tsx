@@ -35,6 +35,7 @@ const GameManager = () => {
 
   return (
     <Stack gap={"sm"}>
+      <GameCard isNew />
       {games.data.map(game => (
         <GameCard key={game.id} game={game} onDelete={() => handleDeleteGame(game.id)} />
       ))}
