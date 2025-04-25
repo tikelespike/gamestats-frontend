@@ -51,12 +51,16 @@ interface GameCardProps {
   game?: Game
   onDelete?: () => void
   isNew?: boolean
+  onCancel?: () => void
+  onCreateSuccess?: () => void
 }
 
 const GameCard: FC<GameCardProps> = ({
   game,
   onDelete,
   isNew = false,
+  onCancel,
+  onCreateSuccess,
 }: GameCardProps) => {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.md})`)
@@ -169,6 +173,7 @@ const GameCard: FC<GameCardProps> = ({
           message: "Game created successfully",
           color: "green",
         })
+        onCreateSuccess?.()
       } else {
         await editGame({
           ...gameData,
@@ -180,6 +185,7 @@ const GameCard: FC<GameCardProps> = ({
           message: "Game updated successfully",
           color: "green",
         })
+        setIsEditing(false)
       }
     } catch (error) {
       notifications.show({
@@ -189,7 +195,6 @@ const GameCard: FC<GameCardProps> = ({
       })
       return
     }
-    setIsEditing(false)
     setEditTriggered(false)
   }
 
@@ -197,6 +202,9 @@ const GameCard: FC<GameCardProps> = ({
     form.reset()
     setIsEditing(false)
     setEditedParticipations(indexedParticipants)
+    if (isNew) {
+      onCancel?.()
+    }
   }
 
   const handleEditClick: (
