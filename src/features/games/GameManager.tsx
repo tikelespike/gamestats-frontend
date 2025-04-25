@@ -49,7 +49,7 @@ const GameManager = () => {
 
   return (
     <Stack gap={"sm"}>
-      <Group justify="flex-end">
+      <Group justify="flex-start" mb={"sm"}>
         <Button
           leftSection={<IconPlus size={16} />}
           onClick={handleAddGame}
@@ -66,7 +66,11 @@ const GameManager = () => {
         />
       )}
       {games.data.map(game => (
-        <GameCard key={game.id} game={game} onDelete={() => handleDeleteGame(game.id)} />
+        <GameCard
+          key={game.id}
+          game={game}
+          onDelete={() => handleDeleteGame(game.id)}
+        />
       ))}
     </Stack>
   )
