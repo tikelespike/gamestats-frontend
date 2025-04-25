@@ -147,7 +147,8 @@ const GameCard: FC<GameCardProps> = ({
     },
     validate: {
       name: value => (value.trim().length > 0 ? null : "Game name is required"),
-      scriptId: value => (value ? null : "Script is required"),
+      scriptId: value =>
+        value && Number(value) >= 0 ? null : "Script is required",
     },
   })
 
