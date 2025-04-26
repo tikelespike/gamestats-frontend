@@ -1,7 +1,7 @@
 .avatar {
     box-shadow: var(--mantine-shadow-xs);
     background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-5));
-    border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
+    border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
 }
 
 .avatar[data-alignment="good"] {
@@ -18,29 +18,45 @@
     overflow: visible;
 }
 
-.avatarContainer[data-clickable="true"] {
+/* Regular clickable avatar styles */
+.avatarContainer[data-clickable="true"]:not([data-add-player="true"]) {
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.avatarContainer[data-clickable="true"]:hover {
+.avatarContainer[data-clickable="true"]:not([data-add-player="true"]):hover {
     transform: scale(1.05);
 }
 
-.avatarContainer[data-clickable="true"]:active {
+.avatarContainer[data-clickable="true"]:not([data-add-player="true"]):active {
     transform: scale(1.0);
 }
 
-.avatar[data-clickable="true"] {
+.avatar[data-clickable="true"]:not([data-add-player="true"]) {
     transition: box-shadow 0.1s ease;
 }
 
-.avatar[data-clickable="true"]:hover {
+.avatar[data-clickable="true"]:not([data-add-player="true"]):hover {
     box-shadow: var(--mantine-shadow-lg);
 }
 
-.avatar[data-clickable="true"]:active {
+.avatar[data-clickable="true"]:not([data-add-player="true"]):active {
     box-shadow: var(--mantine-shadow-sm);
+}
+
+/* Add player avatar styles */
+.avatarContainer[data-add-player="true"] {
+    cursor: pointer;
+}
+
+.avatar[data-add-player="true"] {
+    box-shadow: none;
+    background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+    transition: background-color 0.2s ease;
+}
+
+.avatar[data-add-player="true"]:hover {
+    background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
 }
 
 .shroud {

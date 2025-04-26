@@ -39,6 +39,7 @@ const PlayerAvatar = ({
       <div
         className={styles.avatarContainer}
         data-clickable={onClick !== undefined}
+        data-add-player={!participation && placeholder !== undefined}
         onClick={onClick}
       >
         <Avatar
@@ -50,6 +51,7 @@ const PlayerAvatar = ({
           variant={"transparent"}
           data-alignment={alignment}
           data-clickable={onClick !== undefined}
+          data-add-player={!participation && placeholder !== undefined}
         >
           {placeholder ||
             (characterId == null ? (
