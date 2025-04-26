@@ -28,11 +28,10 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
+
+import type { Game, PlayerParticipation, Script } from "../api/apiSlice"
 import {
   Alignment,
-  Game,
-  PlayerParticipation,
-  Script,
   useCreateGameMutation,
   useEditGameMutation,
   usePlayersQuery,
@@ -70,7 +69,18 @@ const GameCard: FC<GameCardProps> = ({
   const [createGame] = useCreateGameMutation()
   const [editTriggered, setEditTriggered] = React.useState(false)
 
+  const defaultParticipations: number = 5
+
   // For new games, create an empty game object
+  const defaultParticipation: PlayerParticipation = {
+    playerId: null,
+    initialCharacterId: null,
+    initialAlignment: null,
+    endCharacterId: null,
+    endAlignment: null,
+    isAliveAtEnd: false,
+  }
+
   const currentGame: Game = game ?? {
     id: -1,
     version: 0,
@@ -80,7 +90,10 @@ const GameCard: FC<GameCardProps> = ({
     storytellerIds: [],
     winningAlignment: Alignment.Good,
     winningPlayerIds: [],
-    participants: [],
+    participants: Array.from(
+      { length: defaultParticipations },
+      () => defaultParticipation,
+    ),
   }
 
   // "freeze" the indices of the participations so we can use them as keys from here on
@@ -445,7 +458,8 @@ const GameCard: FC<GameCardProps> = ({
   })
 
   const winnersJoined = winningNames.join(", ")
-  const winnerTextAppendix = ` (${winnersJoined})`
+  const winnerTextAppendix =
+    winningNames.length > 0 ? ` (${winnersJoined})` : ""
   const winnersText = currentGame.winningAlignment
     ? `${currentGame.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
     : winnersJoined

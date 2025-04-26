@@ -113,31 +113,32 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
     })
 
   if (isEditing) {
+    const addPlayer = () => {
+      const maxSeatId = participations.reduce(
+        (max, p) => Math.max(max, p.seatId),
+        0,
+      )
+
+      const newParticipation: IndexedPlayerParticipation = {
+        seatId: maxSeatId + 1,
+        participation: {
+          playerId: null,
+          initialCharacterId: null,
+          initialAlignment: null,
+          endCharacterId: null,
+          endAlignment: null,
+          isAliveAtEnd: false,
+        },
+      }
+
+      onParticipationsChange?.([...participations, newParticipation])
+    }
     elements.unshift({
       element: (
         <PlayerAvatar
           key="add-player"
           overrideText="Add Player"
-          onClick={() => {
-            const maxSeatId = participations.reduce(
-              (max, p) => Math.max(max, p.seatId),
-              0,
-            )
-
-            const newParticipation: IndexedPlayerParticipation = {
-              seatId: maxSeatId + 1,
-              participation: {
-                playerId: null,
-                initialCharacterId: null,
-                initialAlignment: null,
-                endCharacterId: null,
-                endAlignment: null,
-                isAliveAtEnd: true,
-              },
-            }
-
-            onParticipationsChange?.([...participations, newParticipation])
-          }}
+          onClick={addPlayer}
           placeholder={<IconPlus size={"md"} />}
         />
       ),
@@ -145,18 +146,22 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
     })
   }
 
+  const beginningEndControl = (
+    <SegmentedControl
+      value={displayState}
+      onChange={value => setDisplayState(value as "initial" | "final")}
+      data={[
+        { label: "Beginning", value: "initial" },
+        { label: "End", value: "final" },
+      ]}
+    />
+  )
+
   if (isMobile) {
     return (
       <Box my="xs">
         <Box style={{ display: "flex", justifyContent: "center" }}>
-          <SegmentedControl
-            value={displayState}
-            onChange={value => setDisplayState(value as "initial" | "final")}
-            data={[
-              { label: "Beginning", value: "initial" },
-              { label: "End", value: "final" },
-            ]}
-          />
+          {beginningEndControl}
         </Box>
         <Grid my={"xl"} gutter="md">
           {elements.map(element => (
@@ -209,14 +214,7 @@ const PlayerCircle: FC<PlayerCircleProps> = ({
           transform: "translate(-50%, -50%)",
         }}
       >
-        <SegmentedControl
-          value={displayState}
-          onChange={value => setDisplayState(value as "initial" | "final")}
-          data={[
-            { label: "Beginning", value: "initial" },
-            { label: "End", value: "final" },
-          ]}
-        />
+        {beginningEndControl}
       </div>
     </Box>
   )
