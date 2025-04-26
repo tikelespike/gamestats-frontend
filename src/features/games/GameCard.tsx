@@ -21,11 +21,11 @@ import {
   IconAlertTriangle,
   IconChevronDown,
   IconChevronRight,
-  IconCrown,
   IconEdit,
   IconMessageCircleUser,
   IconScript,
   IconTrash,
+  IconTrophy,
 } from "@tabler/icons-react"
 import PlayerCircle from "./PlayerCircle"
 
@@ -38,7 +38,7 @@ import {
   useScriptsQuery,
 } from "../api/apiSlice"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
-import { truncate } from "../../utils/utils"
+import { titleCase, truncate } from "../../utils/utils"
 import { useForm } from "@mantine/form"
 import { notifications } from "@mantine/notifications"
 
@@ -462,7 +462,7 @@ const GameCard: FC<GameCardProps> = ({
   const winnerTextAppendix =
     winningNames.length > 0 ? ` (${winnersJoined})` : ""
   const winnersText = currentGame.winningAlignment
-    ? `${currentGame.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
+    ? `${titleCase(currentGame.winningAlignment)} Team${isMobile ? "" : winnerTextAppendix}`
     : winnersJoined
 
   const winnersSelectOptions = React.useMemo(() => {
@@ -515,7 +515,7 @@ const GameCard: FC<GameCardProps> = ({
   const gameWinnersComponent = (
     <Group>
       <ThemeIcon size="lg" variant="light" color="yellow">
-        <IconCrown style={{ width: "70%", height: "70%" }} />
+        <IconTrophy style={{ width: "70%", height: "70%" }} />
       </ThemeIcon>
       {isEditing ? (
         <>
@@ -558,7 +558,17 @@ const GameCard: FC<GameCardProps> = ({
           )}
         </>
       ) : (
-        <Text>{truncate(winnersText, isMobile ? 35 : 70)}</Text>
+        <Text
+          c={
+            currentGame.winningAlignment === Alignment.Good
+              ? "blue"
+              : currentGame.winningAlignment === Alignment.Evil
+                ? "red"
+                : undefined
+          }
+        >
+          {truncate(winnersText, isMobile ? 35 : 70)}
+        </Text>
       )}
     </Group>
   )
