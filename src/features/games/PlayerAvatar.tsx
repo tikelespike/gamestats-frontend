@@ -37,21 +37,19 @@ const PlayerAvatar = ({
   return (
     <Stack align="center" gap="xs">
       <div
-        style={{
-          position: "relative",
-          display: "inline-block",
-          overflow: "visible",
-        }}
+        className={styles.avatarContainer}
+        data-clickable={onClick !== undefined}
+        onClick={onClick}
       >
         <Avatar
           src={characters.data?.find(c => c.id === characterId)?.imageUrl}
           size="xl"
           radius="100%"
           className={styles.avatar}
-          onClick={onClick}
           p={"md"}
           variant={"transparent"}
           data-alignment={alignment}
+          data-clickable={onClick !== undefined}
         >
           {placeholder ||
             (characterId == null ? (

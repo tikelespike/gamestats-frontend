@@ -12,6 +12,37 @@
     background: var(--mantine-color-red-light);
 }
 
+.avatarContainer {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+}
+
+.avatarContainer[data-clickable="true"] {
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.avatarContainer[data-clickable="true"]:hover {
+    transform: scale(1.05);
+}
+
+.avatarContainer[data-clickable="true"]:active {
+    transform: scale(1.0);
+}
+
+.avatar[data-clickable="true"] {
+    transition: box-shadow 0.1s ease;
+}
+
+.avatar[data-clickable="true"]:hover {
+    box-shadow: var(--mantine-shadow-lg);
+}
+
+.avatar[data-clickable="true"]:active {
+    box-shadow: var(--mantine-shadow-sm);
+}
+
 .shroud {
     position: absolute;
     top: -10%;
