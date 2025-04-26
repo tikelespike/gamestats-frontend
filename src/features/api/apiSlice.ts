@@ -101,6 +101,17 @@ export interface Game {
   name: string
   description: string | null
   scriptId: number
+  storytellerIds: number[]
+  winningAlignment: string | null
+  winningPlayerIds: number[]
+  participants: PlayerParticipation[]
+}
+
+export interface GameCreationRequest {
+  name: string
+  description: string | null
+  scriptId: number
+  storytellerIds: number[]
   winningAlignment: string | null
   winningPlayerIds: number[]
   participants: PlayerParticipation[]
@@ -239,7 +250,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Games"],
     }),
-    createGame: builder.mutation<Game, Omit<Game, "id" | "version">>({
+    createGame: builder.mutation<Game, GameCreationRequest>({
       query: request => ({
         url: "/games",
         method: "POST",

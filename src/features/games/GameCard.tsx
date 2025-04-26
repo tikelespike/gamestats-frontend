@@ -23,6 +23,7 @@ import {
   IconChevronRight,
   IconCrown,
   IconEdit,
+  IconMessageCircleUser,
   IconScript,
   IconTrash,
 } from "@tabler/icons-react"
@@ -70,12 +71,13 @@ const GameCard: FC<GameCardProps> = ({
   const [editTriggered, setEditTriggered] = React.useState(false)
 
   // For new games, create an empty game object
-  const initialGame: Game = game ?? {
+  const currentGame: Game = game ?? {
     id: -1,
     version: 0,
     name: "",
     description: null,
     scriptId: -1,
+    storytellerIds: [],
     winningAlignment: Alignment.Good,
     winningPlayerIds: [],
     participants: [],
@@ -85,7 +87,7 @@ const GameCard: FC<GameCardProps> = ({
   // out, even if the order changes. The intuition is that we are placing them on seats in a circle.
   // We can move each circle around or change the player and its data on the seat, but it's the same seat.
   const indexedParticipants: IndexedPlayerParticipation[] =
-    initialGame.participants.map((participation, index) => ({
+    currentGame.participants.map((participation, index) => ({
       participation,
       seatId: index,
     }))
@@ -116,34 +118,24 @@ const GameCard: FC<GameCardProps> = ({
   const [opened, { open, toggle }] = useDisclosure(isNew)
   const scripts = useScriptsQuery()
   const players = usePlayersQuery()
-  const winningNames = initialGame.winningPlayerIds.map(id => {
-    if (!players.data) return "Loading name..."
-
-    const player = players.data.find(p => p.id === id)
-    if (!player) return "Unknown Player"
-    return player?.name.split(" ")[0]
-  })
-
-  const isIncomplete = initialGame.participants.some(
-    g =>
-      g.playerId === null ||
-      g.initialCharacterId === null ||
-      g.endCharacterId === null,
-  )
-
-  const winnersJoined = winningNames.join(", ")
-  const winnerTextAppendix = ` (${winnersJoined})`
-  const winnersText = initialGame.winningAlignment
-    ? `${initialGame.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
-    : winnersJoined
+  const isIncomplete =
+    currentGame.participants.some(
+      g =>
+        g.playerId === null ||
+        g.initialCharacterId === null ||
+        g.endCharacterId === null,
+    ) ||
+    !currentGame.storytellerIds ||
+    currentGame.storytellerIds.length === 0
 
   const form = useForm({
     initialValues: {
-      name: initialGame.name,
-      description: initialGame.description ?? "",
-      scriptId: initialGame.scriptId?.toString(),
-      winningAlignment: initialGame.winningAlignment,
-      winningPlayerIds: initialGame.winningPlayerIds,
+      name: currentGame.name,
+      description: currentGame.description ?? "",
+      scriptId: currentGame.scriptId?.toString(),
+      storytellerIds: currentGame.storytellerIds,
+      winningAlignment: currentGame.winningAlignment,
+      winningPlayerIds: currentGame.winningPlayerIds,
     },
     validate: {
       name: value => (value.trim().length > 0 ? null : "Game name is required"),
@@ -158,6 +150,7 @@ const GameCard: FC<GameCardProps> = ({
       name: form.values.name,
       description: form.values.description || null,
       scriptId: Number(form.values.scriptId),
+      storytellerIds: form.values.storytellerIds,
       // use new order of list as new order of participations, throwing away the old order which was used as keys
       participants: editedParticipations.map(p => p.participation),
       winningAlignment: form.values.winningAlignment,
@@ -175,8 +168,8 @@ const GameCard: FC<GameCardProps> = ({
       } else {
         await editGame({
           ...gameData,
-          id: initialGame.id,
-          version: initialGame.version,
+          id: currentGame.id,
+          version: currentGame.version,
         }).unwrap()
         notifications.show({
           title: "Success",
@@ -210,11 +203,12 @@ const GameCard: FC<GameCardProps> = ({
   ) => void = e => {
     e.stopPropagation()
     form.setValues({
-      name: initialGame.name,
-      description: initialGame.description || "",
-      scriptId: initialGame.scriptId?.toString(),
-      winningAlignment: initialGame.winningAlignment,
-      winningPlayerIds: initialGame.winningPlayerIds,
+      name: currentGame.name,
+      description: currentGame.description || "",
+      scriptId: currentGame.scriptId?.toString(),
+      storytellerIds: currentGame.storytellerIds,
+      winningAlignment: currentGame.winningAlignment,
+      winningPlayerIds: currentGame.winningPlayerIds,
     })
     setEditedParticipations(indexedParticipants)
     open()
@@ -224,7 +218,7 @@ const GameCard: FC<GameCardProps> = ({
   const currentScript: Script | undefined = scripts.data?.find(
     s =>
       s.id ===
-      (isEditing ? Number(form.values.scriptId) : initialGame.scriptId),
+      (isEditing ? Number(form.values.scriptId) : currentGame.scriptId),
   )
 
   const winningTeamOptions = [
@@ -232,18 +226,6 @@ const GameCard: FC<GameCardProps> = ({
     { label: "Evil Team", value: "evil" },
     { label: "Custom", value: "custom" },
   ]
-
-  const playerSelectOptions = React.useMemo(() => {
-    if (!players.data) return []
-    return players.data
-      .filter(p =>
-        editedParticipations.some(part => part.participation.playerId === p.id),
-      )
-      .map(p => ({
-        value: p.id.toString(),
-        label: p.name.split(" ")[0],
-      }))
-  }, [players.data, editedParticipations])
 
   const gameNameComponent = isEditing ? (
     <TextInput
@@ -257,9 +239,10 @@ const GameCard: FC<GameCardProps> = ({
     />
   ) : (
     <Text fw={500} size="md">
-      {truncate(initialGame.name || "New Game", isMobile ? 30 : 70)}
+      {truncate(currentGame.name || "New Game", isMobile ? 30 : 70)}
     </Text>
   )
+
   const incompleteGameWarning = (
     <>
       <HoverCard shadow={"md"}>
@@ -371,7 +354,6 @@ const GameCard: FC<GameCardProps> = ({
       {isEditing ? editButtons : cardHeaderButtons}
     </Group>
   )
-
   const gameScriptComponent = (
     <Group>
       <ThemeIcon size="lg" variant="light">
@@ -396,7 +378,7 @@ const GameCard: FC<GameCardProps> = ({
       ) : (
         <Text>
           {scripts.data ? (
-            scripts.data.find(s => s.id === initialGame.scriptId)?.name
+            scripts.data.find(s => s.id === currentGame.scriptId)?.name
           ) : (
             <i>Loading...</i>
           )}
@@ -404,6 +386,82 @@ const GameCard: FC<GameCardProps> = ({
       )}
     </Group>
   )
+
+  const storytellersSelectOptions = React.useMemo(() => {
+    if (!players.data) return []
+    return players.data.map(p => ({
+      value: p.id.toString(),
+      label: p.name,
+    }))
+  }, [players.data])
+
+  const storytellerNames = currentGame.storytellerIds
+    ? currentGame.storytellerIds.map(id => {
+        if (!players.data) return "Loading name..."
+
+        const player = players.data.find(p => p.id === id)
+        if (!player) return "Unknown Player"
+        return player?.name
+      })
+    : []
+
+  const storytellersText =
+    storytellerNames.length > 0 ? (
+      truncate(storytellerNames.join(", "), isMobile ? 35 : 70)
+    ) : (
+      <i>Unknown</i>
+    )
+
+  const gameStorytellersComponent = (
+    <Group>
+      <ThemeIcon size="lg" variant="light" color="gray">
+        <IconMessageCircleUser style={{ width: "70%", height: "70%" }} />
+      </ThemeIcon>
+      {isEditing ? (
+        <MultiSelect
+          data={storytellersSelectOptions}
+          disabled={editTriggered}
+          value={form.values.storytellerIds.map(id => id.toString())}
+          onChange={values => {
+            form.setFieldValue(
+              "storytellerIds",
+              values.map(v => parseInt(v)),
+            )
+          }}
+          placeholder="Select storyteller(s)"
+        />
+      ) : (
+        <Text>{storytellersText}</Text>
+      )}
+    </Group>
+  )
+
+  const winningNames = currentGame.winningPlayerIds.map(id => {
+    if (!players.data) return "Loading name..."
+
+    const player = players.data.find(p => p.id === id)
+    if (!player) return "Unknown Player"
+    return player?.name.split(" ")[0]
+  })
+
+  const winnersJoined = winningNames.join(", ")
+  const winnerTextAppendix = ` (${winnersJoined})`
+  const winnersText = currentGame.winningAlignment
+    ? `${currentGame.winningAlignment.toUpperCase()} TEAM${isMobile ? "" : winnerTextAppendix}`
+    : winnersJoined
+
+  const winnersSelectOptions = React.useMemo(() => {
+    if (!players.data) return []
+    return players.data
+      .filter(p =>
+        editedParticipations.some(part => part.participation.playerId === p.id),
+      )
+      .map(p => ({
+        value: p.id.toString(),
+        label: p.name.split(" ")[0],
+      }))
+  }, [players.data, editedParticipations])
+
   const gameWinnersComponent = (
     <Group>
       <ThemeIcon size="lg" variant="light" color="yellow">
@@ -435,7 +493,7 @@ const GameCard: FC<GameCardProps> = ({
           />
           {form.values.winningAlignment === null && (
             <MultiSelect
-              data={playerSelectOptions}
+              data={winnersSelectOptions}
               disabled={editTriggered}
               value={form.values.winningPlayerIds.map(id => id.toString())}
               onChange={values => {
@@ -464,18 +522,19 @@ const GameCard: FC<GameCardProps> = ({
     />
   ) : (
     <Text mb={"md"} c={"dimmed"}>
-      {initialGame.description}
+      {currentGame.description}
     </Text>
   )
 
   const cardBody = (
     <Stack pt={"xl"}>
       {gameScriptComponent}
+      {gameStorytellersComponent}
       {gameWinnersComponent}
       {gameDescriptionComponent}
       <PlayerCircle
         participations={isEditing ? editedParticipations : indexedParticipants}
-        winningPlayerIds={initialGame.winningPlayerIds}
+        winningPlayerIds={currentGame.winningPlayerIds}
         isEditing={isEditing}
         onParticipationsChange={handleParticipationsChange}
         script={currentScript}
