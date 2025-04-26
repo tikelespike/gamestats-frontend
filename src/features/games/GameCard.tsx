@@ -432,6 +432,7 @@ const GameCard: FC<GameCardProps> = ({
       </ThemeIcon>
       {isEditing ? (
         <MultiSelect
+          searchable
           data={storytellersSelectOptions}
           disabled={editTriggered}
           value={form.values.storytellerIds.map(id => id.toString())}
@@ -471,7 +472,7 @@ const GameCard: FC<GameCardProps> = ({
     const participationPlayerIds = new Set(
       editedParticipations
         .map(part => part.participation.playerId)
-        .filter((id): id is number => id !== null)
+        .filter((id): id is number => id !== null),
     )
     const participationPlayers = players.data
       .filter(p => participationPlayerIds.has(p.id))
@@ -482,7 +483,11 @@ const GameCard: FC<GameCardProps> = ({
 
     // Get storytellers that aren't already in participations
     const storytellerPlayers = players.data
-      .filter(p => form.values.storytellerIds.includes(p.id) && !participationPlayerIds.has(p.id))
+      .filter(
+        p =>
+          form.values.storytellerIds.includes(p.id) &&
+          !participationPlayerIds.has(p.id),
+      )
       .map(p => ({
         value: p.id.toString(),
         label: p.name.split(" ")[0],
@@ -490,7 +495,11 @@ const GameCard: FC<GameCardProps> = ({
 
     // Get remaining players
     const otherPlayers = players.data
-      .filter(p => !participationPlayerIds.has(p.id) && !form.values.storytellerIds.includes(p.id))
+      .filter(
+        p =>
+          !participationPlayerIds.has(p.id) &&
+          !form.values.storytellerIds.includes(p.id),
+      )
       .map(p => ({
         value: p.id.toString(),
         label: p.name.split(" ")[0],
@@ -534,6 +543,7 @@ const GameCard: FC<GameCardProps> = ({
           />
           {form.values.winningAlignment === null && (
             <MultiSelect
+              searchable
               data={winnersSelectOptions}
               disabled={editTriggered}
               value={form.values.winningPlayerIds.map(id => id.toString())}
