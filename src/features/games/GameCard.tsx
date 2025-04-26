@@ -466,15 +466,42 @@ const GameCard: FC<GameCardProps> = ({
 
   const winnersSelectOptions = React.useMemo(() => {
     if (!players.data) return []
-    return players.data
-      .filter(p =>
-        editedParticipations.some(part => part.participation.playerId === p.id),
-      )
+
+    // Get players in participations
+    const participationPlayerIds = new Set(
+      editedParticipations
+        .map(part => part.participation.playerId)
+        .filter((id): id is number => id !== null)
+    )
+    const participationPlayers = players.data
+      .filter(p => participationPlayerIds.has(p.id))
       .map(p => ({
         value: p.id.toString(),
         label: p.name.split(" ")[0],
       }))
-  }, [players.data, editedParticipations])
+
+    // Get storytellers that aren't already in participations
+    const storytellerPlayers = players.data
+      .filter(p => form.values.storytellerIds.includes(p.id) && !participationPlayerIds.has(p.id))
+      .map(p => ({
+        value: p.id.toString(),
+        label: p.name.split(" ")[0],
+      }))
+
+    // Get remaining players
+    const otherPlayers = players.data
+      .filter(p => !participationPlayerIds.has(p.id) && !form.values.storytellerIds.includes(p.id))
+      .map(p => ({
+        value: p.id.toString(),
+        label: p.name.split(" ")[0],
+      }))
+
+    return [
+      { group: "Players in Game", items: participationPlayers },
+      { group: "Storytellers", items: storytellerPlayers },
+      { group: "Other Players", items: otherPlayers },
+    ]
+  }, [players.data, editedParticipations, form.values.storytellerIds])
 
   const gameWinnersComponent = (
     <Group>
