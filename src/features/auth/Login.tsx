@@ -1,4 +1,3 @@
-import React from "react"
 import { useAppDispatch } from "../../app/hooks"
 import { useNavigate } from "react-router-dom"
 import type { LoginRequest } from "../api/apiSlice"

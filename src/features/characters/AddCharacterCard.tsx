@@ -1,4 +1,3 @@
-import React from "react"
 import { Paper } from "@mantine/core"
 import styles from "./AddCharacterCard.module.css"
 import { IconPlus } from "@tabler/icons-react"

@@ -10,9 +10,8 @@ import {
 } from "@mantine/core"
 import { IconExternalLink, IconWand } from "@tabler/icons-react"
 import { useForm } from "@mantine/form"
+import type { AddCharacterRequest, Character } from "../api/apiSlice"
 import {
-  AddCharacterRequest,
-  Character,
   CharacterType,
   useAddCharacterMutation,
   useCharactersQuery,

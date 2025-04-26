@@ -1,4 +1,3 @@
-import React from "react"
 import styles from "./AddScriptCard.module.css"
 import { Center, Paper } from "@mantine/core"
 import { IconPlus } from "@tabler/icons-react"

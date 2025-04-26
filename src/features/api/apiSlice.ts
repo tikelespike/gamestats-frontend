@@ -100,7 +100,7 @@ export interface Game {
   version: number
   name: string
   description: string | null
-  scriptId: number
+  scriptId: number | null
   storytellerIds: number[]
   winningAlignment: string | null
   winningPlayerIds: number[]

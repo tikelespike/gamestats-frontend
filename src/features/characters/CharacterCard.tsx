@@ -1,4 +1,4 @@
-import React from "react"
+import type React from "react"
 import { Avatar, Checkbox, Paper, Text } from "@mantine/core"
 import styles from "./CharacterCard.module.css"
 import type { Character } from "../api/apiSlice"
