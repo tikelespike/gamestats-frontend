@@ -15,9 +15,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@mantine/core": "^7.15.3",
-    "@mantine/form": "^7.15.3",
-    "@mantine/hooks": "^7.15.3",
+    "@mantine/core": "^7.17.3",
+    "@mantine/form": "^7.17.3",
+    "@mantine/hooks": "^7.17.3",
     "@mantine/modals": "^7.17.3",
     "@mantine/notifications": "^7.17.3",
     "@reduxjs/toolkit": "^2.0.1",
