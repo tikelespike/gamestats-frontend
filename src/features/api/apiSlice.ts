@@ -119,7 +119,7 @@ export interface GameCreationRequest {
 
 export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL as string,
+    baseUrl: (window as any).__APP_CONFIG__?.apiBaseUrl as string,
     prepareHeaders: (headers, { getState }) => {
       // By default, if we have a token in the store, let's use that for authenticated requests
       const token = (getState() as RootState).auth.token
