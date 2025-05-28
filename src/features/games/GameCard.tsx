@@ -203,7 +203,6 @@ const GameCard: FC<GameCardProps> = ({
         message: `Failed to ${isNew ? "create" : "update"} game. Please try again.`,
         color: "red",
       })
-      return
     }
     setEditTriggered(false)
   }
