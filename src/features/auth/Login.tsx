@@ -89,7 +89,7 @@ export const Login = () => {
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <TextInput
             label="Email"
-            placeholder="you@mantine.dev"
+            placeholder="you@domain.com"
             required
             {...form.getInputProps("email")}
           />
