@@ -33,6 +33,7 @@ export interface ScriptFormProps {
   isSubmitting?: boolean
 }
 
+const MAX_DESCRIPTION_LENGTH = 5000
 const ScriptForm = ({
   initialValues = {
     name: "",
@@ -64,6 +65,10 @@ const ScriptForm = ({
     validate: {
       name: value =>
         value.trim().length > 0 ? null : "Script name is required",
+      description: value =>
+        !value || value.length <= MAX_DESCRIPTION_LENGTH
+          ? null
+          : "Description too long",
     },
   })
 
@@ -169,6 +174,7 @@ const ScriptForm = ({
               label="Description"
               placeholder="An easy script suitable for beginners."
               minRows={3}
+              maxLength={MAX_DESCRIPTION_LENGTH}
               autosize
               disabled={isSubmitting}
               {...form.getInputProps("description")}
@@ -226,8 +232,8 @@ const ScriptForm = ({
                         >
                           <Group justify="space-between" wrap="nowrap">
                             <Title order={6}>
-                              {formatCharacterType(type)} ({typeCharacters.length}
-                              )
+                              {formatCharacterType(type)} (
+                              {typeCharacters.length})
                             </Title>
                             {expandedTypes[type] ? (
                               <IconChevronDown size={16} />

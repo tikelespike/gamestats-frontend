@@ -55,6 +55,8 @@ interface GameCardProps {
   onCreateSuccess?: () => void
 }
 
+const DESCRIPTION_MAX_LENGTH = 5000
+
 const GameCard: FC<GameCardProps> = ({
   game,
   onDelete,
@@ -154,6 +156,10 @@ const GameCard: FC<GameCardProps> = ({
       name: value => (value.trim().length > 0 ? null : "Game name is required"),
       scriptId: value =>
         value && Number(value) >= 0 ? null : "Script is required",
+      description: value =>
+        !value || value.length <= DESCRIPTION_MAX_LENGTH
+          ? null
+          : "Description is too long",
     },
   })
 
@@ -197,7 +203,6 @@ const GameCard: FC<GameCardProps> = ({
         message: `Failed to ${isNew ? "create" : "update"} game. Please try again.`,
         color: "red",
       })
-      return
     }
     setEditTriggered(false)
   }
@@ -578,7 +583,7 @@ const GameCard: FC<GameCardProps> = ({
       {...form.getInputProps("description")}
       size="sm"
       autosize
-      maxRows={16}
+      maxLength={DESCRIPTION_MAX_LENGTH}
       disabled={editTriggered}
     />
   ) : (
