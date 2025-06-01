@@ -4,6 +4,7 @@ import { NavBar } from "./NavBar"
 import { Outlet } from "react-router-dom"
 import { ColorSchemeButton } from "../../components/ColorSchemeButton"
 import type React from "react"
+import { UserButton } from "./UserButton"
 
 const MainLayout: React.FC = () => {
   const [opened, { toggle, close }] = useDisclosure()
@@ -18,7 +19,10 @@ const MainLayout: React.FC = () => {
         <Group h="100%" px="md" justify="space-between">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Text size="xl">Blood Manager</Text>
-          <ColorSchemeButton />
+          <Group>
+            <UserButton userId={0} />
+            <ColorSchemeButton />
+          </Group>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
