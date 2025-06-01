@@ -16,8 +16,8 @@ import {
   TextInput,
   Title,
 } from "@mantine/core"
-import { setToken } from "./authSlice"
 import classes from "./Login.module.css"
+import { setUserInfo } from "./authSlice"
 
 interface LoginFormData {
   email: string
@@ -57,10 +57,14 @@ export const Login = () => {
       // using secure cookies in the future.
       if (values.rememberMe) {
         localStorage.setItem("token", response.accessToken)
+        localStorage.setItem("userId", response.userId.toString())
       } else {
         sessionStorage.setItem("token", response.accessToken)
+        sessionStorage.setItem("userId", response.userId.toString())
       }
-      dispatch(setToken({ token: response.accessToken }))
+      dispatch(
+        setUserInfo({ token: response.accessToken, userId: response.userId }),
+      )
       navigate("/manager/games")
     } catch (err) {
       console.error("Login failed:", JSON.stringify(err))

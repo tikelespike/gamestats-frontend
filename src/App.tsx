@@ -11,7 +11,7 @@ import PlayerManager from "./features/players/PlayerManager"
 import NavigateToDefault from "./utils/NavigateToDefault"
 import { NotFound } from "./features/notfound/NotFound"
 import { useEffect, useState } from "react"
-import { setToken } from "./features/auth/authSlice"
+import { setUserInfo } from "./features/auth/authSlice"
 import { jwtDecode } from "jwt-decode"
 import { useAppDispatch } from "./app/hooks"
 import ScriptManager from "./features/scripts/ScriptManager"
@@ -23,11 +23,13 @@ const App = () => {
   useEffect(() => {
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token")
-    if (token) {
+    const userId =
+      localStorage.getItem("userId") || sessionStorage.getItem("userId")
+    if (token && userId) {
       const decoded: { exp: number } = jwtDecode(token)
       const isExpired: boolean = decoded.exp * 1000 < Date.now()
-
-      if (!isExpired) dispatch(setToken({ token }))
+      const userIdNumber = parseInt(userId)
+      if (!isExpired) dispatch(setUserInfo({ token, userId: userIdNumber }))
     }
     setLoading(false)
   }, [dispatch])

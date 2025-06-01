@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { RootState } from "../../app/store"
 
-export interface UserResponse {
+export interface LoginResponse {
   accessToken: string
+  userId: number
 }
 
 export interface LoginRequest {
@@ -132,7 +133,7 @@ export const apiSlice = createApi({
   }),
   tagTypes: ["Players", "Characters", "Scripts", "Games"],
   endpoints: builder => ({
-    login: builder.mutation<UserResponse, LoginRequest>({
+    login: builder.mutation<LoginResponse, LoginRequest>({
       query: credentials => ({
         url: "/auth/signin",
         method: "POST",

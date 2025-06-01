@@ -3,24 +3,27 @@ import { createSlice } from "@reduxjs/toolkit"
 
 type AuthState = {
   token: string | null
+  userId: number | null
 }
 
 export const authSlice = createSlice({
   name: "auth",
-  initialState: { token: null } as AuthState,
+  initialState: { token: null, userId: null } as AuthState,
   reducers: {
-    setToken: (
+    setUserInfo: (
       state,
-      { payload: { token } }: PayloadAction<{ token: string }>,
+      { payload: { token, userId } }: PayloadAction<AuthState>,
     ) => {
       state.token = token
+      state.userId = userId
     },
     logout: state => {
       state.token = null
+      state.userId = null
     },
   },
 })
 
-export const { setToken, logout } = authSlice.actions
+export const { setUserInfo, logout } = authSlice.actions
 
 export default authSlice.reducer
