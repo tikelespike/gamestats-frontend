@@ -4,7 +4,6 @@ import {
   IconLogout,
   IconScript,
   IconUsers,
-  IconUserSquareRounded,
 } from "@tabler/icons-react"
 import classes from "./NavBar.module.css"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -16,7 +15,7 @@ const data = [
   { link: "/manager/scripts", label: "Scripts", icon: IconScript },
   { link: "/manager/characters", label: "Characters", icon: IconCircles },
   { link: "/manager/players", label: "Players", icon: IconUsers },
-  { link: "/manager/users", label: "Users", icon: IconUserSquareRounded },
+  // { link: "/manager/users", label: "Users", icon: IconUserSquareRounded }, // Not implemented yet
 ]
 
 export function NavBar({ onNavigate }: { onNavigate: () => void }) {
