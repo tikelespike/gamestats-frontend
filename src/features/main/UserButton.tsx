@@ -1,4 +1,10 @@
-import { IconLogout, IconPassword } from "@tabler/icons-react"
+import {
+  IconChevronRight,
+  IconLogout,
+  IconMoon,
+  IconPassword,
+  IconSun,
+} from "@tabler/icons-react"
 import {
   Avatar,
   Group,
@@ -6,6 +12,8 @@ import {
   Menu,
   Text,
   UnstyledButton,
+  useComputedColorScheme,
+  useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core"
 import classes from "./UserButton.module.css"
@@ -19,6 +27,11 @@ interface UserButtonProps {
 
 export function UserButton({ userId }: UserButtonProps) {
   const theme = useMantineTheme()
+  const { setColorScheme } = useMantineColorScheme()
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  })
+
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`)
   const users = useUsersQuery()
   if (users.isLoading) {
@@ -44,20 +57,39 @@ export function UserButton({ userId }: UserButtonProps) {
             <Avatar name={user.name} radius="xl" />
 
             {!isMobile && (
-              <div style={{ flex: 1 }}>
-                <Text size="sm" fw={500}>
-                  {user.name}
-                </Text>
+              <>
+                <div style={{ flex: 1 }}>
+                  <Text size="sm" fw={500}>
+                    {user.name}
+                  </Text>
 
-                <Text c="dimmed" size="xs">
-                  {user.email}
-                </Text>
-              </div>
+                  <Text c="dimmed" size="xs">
+                    {user.email}
+                  </Text>
+                </div>
+                <IconChevronRight size={14} stroke={1.5} />
+              </>
             )}
           </Group>
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
+        <Menu.Label>Interface</Menu.Label>
+        <Menu.Item
+          leftSection={
+            computedColorScheme === "light" ? (
+              <IconMoon size={16} stroke={1.5} />
+            ) : (
+              <IconSun size={16} stroke={1.5} />
+            )
+          }
+          onClick={() =>
+            setColorScheme(computedColorScheme === "light" ? "dark" : "light")
+          }
+        >
+          Toggle Theme
+        </Menu.Item>
+
         <Menu.Label>Account</Menu.Label>
         <Menu.Item leftSection={<IconPassword size={16} stroke={1.5} />}>
           Change password

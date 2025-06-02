@@ -2,7 +2,6 @@ import { useDisclosure } from "@mantine/hooks"
 import { AppShell, Burger, Group, Text } from "@mantine/core"
 import { NavBar } from "./NavBar"
 import { Outlet } from "react-router-dom"
-import { ColorSchemeButton } from "../../components/ColorSchemeButton"
 import type React from "react"
 import { UserButton } from "./UserButton"
 import { useAppSelector } from "../../app/hooks"
@@ -21,10 +20,7 @@ const MainLayout: React.FC = () => {
         <Group h="100%" px="md" justify="space-between">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Text size="xl">Blood Manager</Text>
-          <Group>
-            {userId != null && <UserButton userId={userId} />}
-            <ColorSchemeButton />
-          </Group>
+          {userId != null && <UserButton userId={userId} />}
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
