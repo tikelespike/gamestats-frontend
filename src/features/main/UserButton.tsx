@@ -2,6 +2,7 @@ import { IconLogout, IconPassword } from "@tabler/icons-react"
 import {
   Avatar,
   Group,
+  Loader,
   Menu,
   Text,
   UnstyledButton,
@@ -9,6 +10,8 @@ import {
 } from "@mantine/core"
 import classes from "./UserButton.module.css"
 import { useMediaQuery } from "@mantine/hooks"
+import type { User } from "../api/apiSlice"
+import { useUsersQuery } from "../api/apiSlice"
 
 interface UserButtonProps {
   userId: number
@@ -17,7 +20,17 @@ interface UserButtonProps {
 export function UserButton({ userId }: UserButtonProps) {
   const theme = useMantineTheme()
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`)
-
+  const users = useUsersQuery()
+  if (users.isLoading) {
+    return <Loader size={"md"} />
+  }
+  if (users.isError || !users.data) {
+    return <div />
+  }
+  const user: User | undefined = users.data.find(u => u.id === userId)
+  if (!user) {
+    return <Text>No user</Text>
+  }
   return (
     <Menu
       withArrow
@@ -28,16 +41,16 @@ export function UserButton({ userId }: UserButtonProps) {
       <Menu.Target>
         <UnstyledButton className={classes.user}>
           <Group>
-            <Avatar name={"Timo Weberruß"} radius="xl" />
+            <Avatar name={user.name} radius="xl" />
 
             {!isMobile && (
               <div style={{ flex: 1 }}>
                 <Text size="sm" fw={500}>
-                  Timo Weberruß
+                  {user.name}
                 </Text>
 
                 <Text c="dimmed" size="xs">
-                  timo@klue.de
+                  {user.email}
                 </Text>
               </div>
             )}

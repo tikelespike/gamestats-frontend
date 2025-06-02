@@ -1,6 +1,31 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { RootState } from "../../app/store"
 
+export enum PermissionLevel {
+  User = "user",
+  Storyteller = "storyteller",
+  Admin = "admin",
+}
+
+export interface User {
+  id: number
+  version: number
+  name: string
+  email: string
+  permissionLevel: PermissionLevel
+  playerId: number | null
+}
+
+export interface UserUpdateRequest {
+  id: number
+  version: number
+  name: string
+  email: string
+  password: string | null
+  permissionLevel: PermissionLevel
+  playerId: number | null
+}
+
 export interface LoginResponse {
   accessToken: string
   userId: number
@@ -131,7 +156,7 @@ export const apiSlice = createApi({
     },
     timeout: 5000,
   }),
-  tagTypes: ["Players", "Characters", "Scripts", "Games"],
+  tagTypes: ["Players", "Characters", "Scripts", "Games", "Users"],
   endpoints: builder => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: credentials => ({
@@ -150,14 +175,14 @@ export const apiSlice = createApi({
         method: "POST",
         body: request,
       }),
-      invalidatesTags: ["Players"],
+      invalidatesTags: ["Players", "Users"],
     }),
     deletePlayer: builder.mutation<void, number>({
       query: id => ({
         url: `/players/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Players", "Games"],
+      invalidatesTags: ["Players", "Games", "Users"],
     }),
     characters: builder.query<Character[], void>({
       query: () => "/characters",
@@ -259,6 +284,18 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Games"],
     }),
+    users: builder.query<User[], void>({
+      query: () => "/users",
+      providesTags: ["Users"],
+    }),
+    editUser: builder.mutation<User, UserUpdateRequest>({
+      query: request => ({
+        url: `/users/${request.id}`,
+        method: "PUT",
+        body: request,
+      }),
+      invalidatesTags: ["Users", "Players"],
+    }),
   }),
 })
 
@@ -282,4 +319,6 @@ export const {
   useDeleteGameMutation,
   useEditGameMutation,
   useCreateGameMutation,
+  useUsersQuery,
+  useEditUserMutation,
 } = apiSlice

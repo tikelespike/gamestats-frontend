@@ -5,9 +5,11 @@ import { Outlet } from "react-router-dom"
 import { ColorSchemeButton } from "../../components/ColorSchemeButton"
 import type React from "react"
 import { UserButton } from "./UserButton"
+import { useAppSelector } from "../../app/hooks"
 
 const MainLayout: React.FC = () => {
   const [opened, { toggle, close }] = useDisclosure()
+  const userId = useAppSelector(state => state.auth.userId)
 
   return (
     <AppShell
@@ -20,7 +22,7 @@ const MainLayout: React.FC = () => {
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Text size="xl">Blood Manager</Text>
           <Group>
-            <UserButton userId={0} />
+            {userId != null && <UserButton userId={userId} />}
             <ColorSchemeButton />
           </Group>
         </Group>
