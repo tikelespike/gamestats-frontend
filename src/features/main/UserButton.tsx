@@ -20,6 +20,8 @@ import classes from "./UserButton.module.css"
 import { useMediaQuery } from "@mantine/hooks"
 import type { User } from "../api/apiSlice"
 import { useUsersQuery } from "../api/apiSlice"
+import { useAppDispatch } from "../../app/hooks"
+import { logout } from "../auth/authSlice"
 
 interface UserButtonProps {
   userId: number
@@ -31,6 +33,15 @@ export function UserButton({ userId }: UserButtonProps) {
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   })
+  const dispatch = useAppDispatch()
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("userId")
+    sessionStorage.removeItem("token")
+    sessionStorage.removeItem("userId")
+    dispatch(logout()) // Reset Redux state
+  }
 
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`)
   const users = useUsersQuery()
@@ -94,7 +105,10 @@ export function UserButton({ userId }: UserButtonProps) {
         <Menu.Item leftSection={<IconPassword size={16} stroke={1.5} />}>
           Change password
         </Menu.Item>
-        <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />}>
+        <Menu.Item
+          leftSection={<IconLogout size={16} stroke={1.5} />}
+          onClick={handleLogout}
+        >
           Logout
         </Menu.Item>
       </Menu.Dropdown>
