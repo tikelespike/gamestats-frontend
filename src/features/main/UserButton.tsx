@@ -81,7 +81,10 @@ export function UserButton({ userId }: UserButtonProps) {
     return <Text>No user</Text>
   }
 
-  const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
+  const handlePasswordSubmit = async (values: {
+    password: string
+    confirmPassword: string
+  }) => {
     setPasswordChangeTriggered(true)
     const updateValues: UserUpdateRequest = {
       ...user,
@@ -89,12 +92,6 @@ export function UserButton({ userId }: UserButtonProps) {
     }
     try {
       await updateUser(updateValues).unwrap()
-      notifications.show({
-        title: "Success",
-        message: "Password updated successfully",
-        color: "green",
-      })
-      setIsPasswordModalOpen(false)
     } catch (err) {
       notifications.show({
         title: "Update failed",
@@ -106,7 +103,14 @@ export function UserButton({ userId }: UserButtonProps) {
         position: "top-center",
       })
       setPasswordChangeTriggered(false)
+      return
     }
+    notifications.show({
+      title: "Success",
+      message: "Password updated successfully",
+      color: "green",
+    })
+    setIsPasswordModalOpen(false)
   }
 
   return (
@@ -161,6 +165,7 @@ export function UserButton({ userId }: UserButtonProps) {
             leftSection={<IconPassword size={16} stroke={1.5} />}
             onClick={() => {
               passwordForm.reset()
+              setPasswordChangeTriggered(false)
               setIsPasswordModalOpen(true)
             }}
           >
