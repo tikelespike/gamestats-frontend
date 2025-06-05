@@ -9,10 +9,10 @@ import {
   Avatar,
   Button,
   Group,
-  Loader,
   Menu,
   Modal,
   PasswordInput,
+  Skeleton,
   Stack,
   Text,
   UnstyledButton,
@@ -71,7 +71,7 @@ export function UserButton({ userId }: UserButtonProps) {
 
   const users = useUsersQuery()
   if (users.isLoading) {
-    return <Loader size={"md"} />
+    return <Skeleton width={"200px"} height={"40px"} />
   }
   if (users.isError || !users.data) {
     return <div />
