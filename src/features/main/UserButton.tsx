@@ -13,6 +13,7 @@ import {
   Menu,
   Modal,
   PasswordInput,
+  Stack,
   Text,
   UnstyledButton,
   useComputedColorScheme,
@@ -57,10 +58,13 @@ export function UserButton({ userId }: UserButtonProps) {
   const passwordForm = useForm({
     initialValues: {
       password: "",
+      confirmPassword: "",
     },
     validate: {
       password: value =>
         value && value.length >= 6 ? null : "Password too short",
+      confirmPassword: (value, values) =>
+        value === values.password ? null : "Passwords do not match",
     },
   })
   const [updateUser] = useEditUserMutation()
@@ -77,7 +81,7 @@ export function UserButton({ userId }: UserButtonProps) {
     return <Text>No user</Text>
   }
 
-  const handlePasswordSubmit = async (values: { password: string }) => {
+  const handlePasswordSubmit = async (values: { password: string; confirmPassword: string }) => {
     setPasswordChangeTriggered(true)
     const updateValues: UserUpdateRequest = {
       ...user,
@@ -178,14 +182,24 @@ export function UserButton({ userId }: UserButtonProps) {
         centered
       >
         <form onSubmit={passwordForm.onSubmit(handlePasswordSubmit)}>
-          <PasswordInput
-            placeholder="New password"
-            {...passwordForm.getInputProps("password")}
-            size="sm"
-            w="100%"
-            maw={500}
-            disabled={passwordChangeTriggered}
-          />
+          <Stack>
+            <PasswordInput
+              placeholder="New password"
+              {...passwordForm.getInputProps("password")}
+              size="sm"
+              w="100%"
+              maw={500}
+              disabled={passwordChangeTriggered}
+            />
+            <PasswordInput
+              placeholder="Confirm new password"
+              {...passwordForm.getInputProps("confirmPassword")}
+              size="sm"
+              w="100%"
+              maw={500}
+              disabled={passwordChangeTriggered}
+            />
+          </Stack>
           <Group mt="xl" justify="flex-end">
             <Button
               variant="default"
