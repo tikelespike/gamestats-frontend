@@ -93,11 +93,12 @@ export function UserButton({ userId }: UserButtonProps) {
     try {
       await updateUser(updateValues).unwrap()
     } catch (err) {
+      const errorMessage =
+        // @ts-ignore
+        err.data?.message || err.message || "An unknown error occurred";
       notifications.show({
         title: "Update failed",
-        message:
-          // @ts-ignore
-          "Password could not be updated (error code " + err.status + ")",
+        message: "Password could not be updated: " + errorMessage,
         color: "red",
         autoClose: false,
         position: "top-center",
