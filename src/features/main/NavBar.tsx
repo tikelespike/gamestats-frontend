@@ -1,6 +1,7 @@
 import {
   IconCircles,
   IconDeviceGamepad,
+  IconLayoutDashboard,
   IconScript,
   IconUsers,
 } from "@tabler/icons-react"
@@ -8,6 +9,7 @@ import classes from "./NavBar.module.css"
 import { useLocation, useNavigate } from "react-router-dom"
 
 const data = [
+  { link: "/manager/dashboard", label: "Dashboard", icon: IconLayoutDashboard },
   { link: "/manager/games", label: "Games", icon: IconDeviceGamepad },
   { link: "/manager/scripts", label: "Scripts", icon: IconScript },
   { link: "/manager/characters", label: "Characters", icon: IconCircles },
