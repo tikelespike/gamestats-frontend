@@ -1,16 +1,22 @@
 import React, { useState } from "react"
 import {
+  Badge,
   Box,
+  Button,
   Card,
+  Grid,
   Group,
+  Modal,
   Progress,
   Select,
+  Stack,
   Table,
   Text,
   Title,
   Tooltip,
-  useMantineTheme,
+  UnstyledButton,
   useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core"
 import {
   type PlayerStats,
@@ -35,8 +41,16 @@ const Dashboard = () => {
   const theme = useMantineTheme()
   const { colorScheme } = useMantineColorScheme()
   const currentUserId = useAppSelector(state => state.auth.userId)
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
 
-  if (statsLoading || playersLoading || usersLoading || !playerStats || !players || !users) {
+  if (
+    statsLoading ||
+    playersLoading ||
+    usersLoading ||
+    !playerStats ||
+    !players ||
+    !users
+  ) {
     return <div>Loading...</div>
   }
 
@@ -61,7 +75,22 @@ const Dashboard = () => {
         stats.totalGamesPlayed > 0
           ? (stats.totalWins / stats.totalGamesPlayed) * 100
           : 0,
-      format: value => `${value.toFixed(1)}%`,
+      format: (value, stats) => {
+        if (stats.totalGamesPlayed === 0) return "No games"
+
+        return (
+          <Tooltip
+            label={`Wins: ${stats.totalWins} | Total: ${stats.totalGamesPlayed}`}
+            position="top"
+            withArrow
+          >
+            <Group gap="xs" align="center">
+              <Progress size="sm" w={100} value={value} color="green" />
+              <Text size="sm">{value.toFixed(1)}%</Text>
+            </Group>
+          </Tooltip>
+        )
+      },
     },
     {
       value: "gamesPlayed",
@@ -79,7 +108,7 @@ const Dashboard = () => {
       format: (value, stats) => {
         const total = stats.timesGood + stats.timesEvil
         if (total === 0) return "No games"
-        
+
         return (
           <Tooltip
             label={`Good: ${stats.timesGood} | Evil: ${stats.timesEvil}`}
@@ -87,16 +116,35 @@ const Dashboard = () => {
             withArrow
           >
             <Group gap="xs" align="center">
-              <Progress
-                size="sm"
-                w={100}
-                value={value}
-                color="blue"
-                bg="red"
-              />
-              <Text size="sm" c="dimmed">
-                {value.toFixed(1)}%
-              </Text>
+              <Progress size="sm" w={100} value={value} color="blue" bg="red" />
+              <Text size="sm">{value.toFixed(1)}%</Text>
+            </Group>
+          </Tooltip>
+        )
+      },
+    },
+    {
+      value: "survivalRate",
+      label: "Survival Rate",
+      getValue: stats => {
+        const gamesAsPlayer = stats.totalGamesPlayed - stats.timesStoryteller
+        return gamesAsPlayer > 0
+          ? ((gamesAsPlayer - stats.timesDeadAtEnd) / gamesAsPlayer) * 100
+          : 0
+      },
+      format: (value, stats) => {
+        const gamesAsPlayer = stats.totalGamesPlayed - stats.timesStoryteller
+        if (gamesAsPlayer === 0) return "No games as player"
+
+        return (
+          <Tooltip
+            label={`Survived: ${gamesAsPlayer - stats.timesDeadAtEnd} | Total as Player: ${gamesAsPlayer}`}
+            position="top"
+            withArrow
+          >
+            <Group gap="xs" align="center">
+              <Progress size="sm" w={100} value={value} color="green" />
+              <Text size="sm">{value.toFixed(1)}%</Text>
             </Group>
           </Tooltip>
         )
@@ -128,6 +176,42 @@ const Dashboard = () => {
     return aName.localeCompare(bName)
   })
 
+  const renderCharacterTypeBadge = (type: string, count: number) => (
+    <Badge key={type} color="blue" variant="light">
+      {type}: {count}
+    </Badge>
+  )
+
+  const renderStatWithProgress = (
+    label: string,
+    value: number,
+    total: number,
+    color: string,
+    bg?: string,
+  ) => (
+    <Stack gap="xs">
+      <Text>{label}</Text>
+      <Group gap="xs" align="center">
+        <Progress
+          size="sm"
+          w={100}
+          value={(value / total) * 100}
+          color={color}
+          bg={bg}
+        />
+        <Text size="sm">
+          {value} / {total} ({((value / total) * 100).toFixed(1)}%)
+        </Text>
+      </Group>
+    </Stack>
+  )
+
+  let playerName: string = "Player"
+  if (selectedPlayer && selectedPlayer.playerId) {
+    playerName = playerMap.get(selectedPlayer.playerId) || "Player"
+    playerName = playerName.split(" ")[0] // Use first name only
+  }
+
   return (
     <div>
       <Box style={{ display: "inline-block" }}>
@@ -138,8 +222,11 @@ const Dashboard = () => {
           <Select
             label="Select Statistic"
             value={selectedStat}
-            onChange={(value) => setSelectedStat(value || "wins")}
-            data={statOptions.map(opt => ({ value: opt.value, label: opt.label }))}
+            onChange={value => setSelectedStat(value || "wins")}
+            data={statOptions.map(opt => ({
+              value: opt.value,
+              label: opt.label,
+            }))}
             mb="md"
           />
           <Table>
@@ -152,23 +239,32 @@ const Dashboard = () => {
             </Table.Thead>
             <Table.Tbody>
               {sortedStats.map((stats, index) => (
-                <Table.Tr 
+                <Table.Tr
                   key={stats.playerId}
                   style={{
-                    backgroundColor: stats.playerId === currentPlayerId 
-                      ? 'var(--mantine-color-blue-light)'
-                      : undefined
+                    backgroundColor:
+                      stats.playerId === currentPlayerId
+                        ? "var(--mantine-color-blue-light)"
+                        : undefined,
                   }}
                 >
                   <Table.Td>{index + 1}</Table.Td>
                   <Table.Td>
-                    <Text fw={index === 0 ? 600 : 400}>
-                      {playerMap.get(stats.playerId) || "Unknown Player"}
-                      {index === 0 && " 🏆"}
-                    </Text>
+                    <UnstyledButton onClick={() => setSelectedPlayer(stats)}>
+                      <Text
+                        fw={index === 0 ? 600 : 400}
+                        style={{ cursor: "pointer" }}
+                      >
+                        {playerMap.get(stats.playerId) || "Unknown Player"}
+                        {index === 0 && " 🏆"}
+                      </Text>
+                    </UnstyledButton>
                   </Table.Td>
                   <Table.Td>
-                    {selectedOption.format(selectedOption.getValue(stats), stats)}
+                    {selectedOption.format(
+                      selectedOption.getValue(stats),
+                      stats,
+                    )}
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -176,6 +272,67 @@ const Dashboard = () => {
           </Table>
         </Card>
       </Box>
+
+      <Modal
+        opened={selectedPlayer !== null}
+        onClose={() => setSelectedPlayer(null)}
+        title={selectedPlayer ? playerMap.get(selectedPlayer.playerId) : ""}
+        size="lg"
+      >
+        {selectedPlayer && (
+          <Stack gap="md">
+            <Grid>
+              <Grid.Col span={6}>
+                <Card withBorder>
+                  <Text fw={500} mb="md">
+                    Game Statistics
+                  </Text>
+                  <Stack gap="md">
+                    {renderStatWithProgress(
+                      "Wins",
+                      selectedPlayer.totalWins,
+                      selectedPlayer.totalGamesPlayed,
+                      "green",
+                    )}
+                    {renderStatWithProgress(
+                      "Survival",
+                      selectedPlayer.totalGamesPlayed -
+                        selectedPlayer.timesStoryteller -
+                        selectedPlayer.timesDeadAtEnd,
+                      selectedPlayer.totalGamesPlayed -
+                        selectedPlayer.timesStoryteller,
+                      "green",
+                    )}
+                    <Text>
+                      {playerName} has run {selectedPlayer.timesStoryteller}{" "}
+                      game(s).
+                    </Text>
+                  </Stack>
+                </Card>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Card withBorder>
+                  <Text fw={500} mb="md">
+                    Alignment Statistics
+                  </Text>
+                  <Stack gap="md">
+                    {renderStatWithProgress(
+                      "Good/Evil Ratio",
+                      selectedPlayer.timesGood,
+                      selectedPlayer.timesGood + selectedPlayer.timesEvil,
+                      "blue",
+                      "red",
+                    )}
+                  </Stack>
+                </Card>
+              </Grid.Col>
+            </Grid>
+          </Stack>
+        )}
+        <Group justify="flex-end" mt="xl">
+          <Button onClick={() => setSelectedPlayer(null)}>Close</Button>
+        </Group>
+      </Modal>
     </div>
   )
 }
