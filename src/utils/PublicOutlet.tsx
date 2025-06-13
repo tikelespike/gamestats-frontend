@@ -6,7 +6,7 @@ export function PublicOutlet() {
   const location = useLocation()
 
   return auth.token ? (
-    <Navigate to="/manager/games" state={{ from: location }} />
+    <Navigate to="/manager/dashboard" state={{ from: location }} />
   ) : (
     <Outlet />
   )

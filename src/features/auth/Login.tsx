@@ -65,7 +65,7 @@ export const Login = () => {
       dispatch(
         setUserInfo({ token: response.accessToken, userId: response.userId }),
       )
-      navigate("/manager/games")
+      navigate("/manager/dashboard")
     } catch (err) {
       console.error("Login failed:", JSON.stringify(err))
     }
