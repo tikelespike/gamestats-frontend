@@ -1,5 +1,4 @@
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import {
   Box,
   Card,
@@ -9,12 +8,17 @@ import {
   Table,
   Text,
   Title,
+  Tooltip,
+  useMantineTheme,
+  useMantineColorScheme,
 } from "@mantine/core"
 import {
   type PlayerStats,
   usePlayersQuery,
   usePlayerStatsQuery,
+  useUsersQuery,
 } from "../api/apiSlice"
+import { useAppSelector } from "../../app/hooks"
 
 type StatOption = {
   value: string
@@ -26,14 +30,22 @@ type StatOption = {
 const Dashboard = () => {
   const { data: playerStats, isLoading: statsLoading } = usePlayerStatsQuery()
   const { data: players, isLoading: playersLoading } = usePlayersQuery()
+  const { data: users, isLoading: usersLoading } = useUsersQuery()
   const [selectedStat, setSelectedStat] = useState<string>("wins")
+  const theme = useMantineTheme()
+  const { colorScheme } = useMantineColorScheme()
+  const currentUserId = useAppSelector(state => state.auth.userId)
 
-  if (statsLoading || playersLoading || !playerStats || !players) {
+  if (statsLoading || playersLoading || usersLoading || !playerStats || !players || !users) {
     return <div>Loading...</div>
   }
 
   // Create a map of player IDs to names for easy lookup
   const playerMap = new Map(players.map(player => [player.id, player.name]))
+
+  // Find the current user's player ID
+  const currentUser = users.find(user => user.id === currentUserId)
+  const currentPlayerId = currentUser?.playerId
 
   const statOptions: StatOption[] = [
     {
@@ -67,14 +79,26 @@ const Dashboard = () => {
       format: (value, stats) => {
         const total = stats.timesGood + stats.timesEvil
         if (total === 0) return "No games"
-
+        
         return (
-          <Group gap="xs" align="center">
-            <Progress size="sm" w={100} value={value} color="blue" bg="red" />
-            <Text size="sm" c="dimmed">
-              {value.toFixed(1)}%
-            </Text>
-          </Group>
+          <Tooltip
+            label={`Good: ${stats.timesGood} | Evil: ${stats.timesEvil}`}
+            position="top"
+            withArrow
+          >
+            <Group gap="xs" align="center">
+              <Progress
+                size="sm"
+                w={100}
+                value={value}
+                color="blue"
+                bg="red"
+              />
+              <Text size="sm" c="dimmed">
+                {value.toFixed(1)}%
+              </Text>
+            </Group>
+          </Tooltip>
         )
       },
     },
@@ -114,11 +138,8 @@ const Dashboard = () => {
           <Select
             label="Select Statistic"
             value={selectedStat}
-            onChange={value => setSelectedStat(value || "wins")}
-            data={statOptions.map(opt => ({
-              value: opt.value,
-              label: opt.label,
-            }))}
+            onChange={(value) => setSelectedStat(value || "wins")}
+            data={statOptions.map(opt => ({ value: opt.value, label: opt.label }))}
             mb="md"
           />
           <Table>
@@ -131,7 +152,14 @@ const Dashboard = () => {
             </Table.Thead>
             <Table.Tbody>
               {sortedStats.map((stats, index) => (
-                <Table.Tr key={stats.playerId}>
+                <Table.Tr 
+                  key={stats.playerId}
+                  style={{
+                    backgroundColor: stats.playerId === currentPlayerId 
+                      ? 'var(--mantine-color-blue-light)'
+                      : undefined
+                  }}
+                >
                   <Table.Td>{index + 1}</Table.Td>
                   <Table.Td>
                     <Text fw={index === 0 ? 600 : 400}>
@@ -140,10 +168,7 @@ const Dashboard = () => {
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    {selectedOption.format(
-                      selectedOption.getValue(stats),
-                      stats,
-                    )}
+                    {selectedOption.format(selectedOption.getValue(stats), stats)}
                   </Table.Td>
                 </Table.Tr>
               ))}
