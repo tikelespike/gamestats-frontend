@@ -43,6 +43,18 @@ export interface Player {
   ownerId: number | null
 }
 
+export interface PlayerStats {
+  playerId: number
+  totalGamesPlayed: number
+  totalWins: number
+  timesStoryteller: number
+  timesDeadAtEnd: number
+  timesGood: number
+  timesEvil: number
+  characterTypeCounts: Record<string, number>
+  characterPlayingCounts: Record<string, number>
+}
+
 export interface AddPlayerRequest {
   name: string
   ownerId: number | null
@@ -156,7 +168,14 @@ export const apiSlice = createApi({
     },
     timeout: 5000,
   }),
-  tagTypes: ["Players", "Characters", "Scripts", "Games", "Users"],
+  tagTypes: [
+    "Players",
+    "PlayerStats",
+    "Characters",
+    "Scripts",
+    "Games",
+    "Users",
+  ],
   endpoints: builder => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: credentials => ({
@@ -175,14 +194,14 @@ export const apiSlice = createApi({
         method: "POST",
         body: request,
       }),
-      invalidatesTags: ["Players", "Users"],
+      invalidatesTags: ["Players", "Users", "PlayerStats"],
     }),
     deletePlayer: builder.mutation<void, number>({
       query: id => ({
         url: `/players/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Players", "Games", "Users"],
+      invalidatesTags: ["Players", "Games", "Users", "PlayerStats"],
     }),
     characters: builder.query<Character[], void>({
       query: () => "/characters",
@@ -217,7 +236,7 @@ export const apiSlice = createApi({
         url: `/characters/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Characters", "Scripts", "Games"], // Deleting a character will remove it from any scripts and games it was in
+      invalidatesTags: ["Characters", "Scripts", "Games", "PlayerStats"], // Deleting a character will remove it from any scripts and games it was in
     }),
     batchDeleteCharacters: builder.mutation<void, number[]>({
       query: ids => ({
@@ -225,7 +244,7 @@ export const apiSlice = createApi({
         method: "DELETE",
         body: ids,
       }),
-      invalidatesTags: ["Characters", "Scripts", "Games"],
+      invalidatesTags: ["Characters", "Scripts", "Games", "PlayerStats"],
     }),
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
@@ -266,7 +285,7 @@ export const apiSlice = createApi({
         url: `/games/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Games"],
+      invalidatesTags: ["Games", "PlayerStats"],
     }),
     editGame: builder.mutation<Game, Game>({
       query: request => ({
@@ -274,7 +293,7 @@ export const apiSlice = createApi({
         method: "PUT",
         body: request,
       }),
-      invalidatesTags: ["Games"],
+      invalidatesTags: ["Games", "PlayerStats"],
     }),
     createGame: builder.mutation<Game, GameCreationRequest>({
       query: request => ({
@@ -282,7 +301,7 @@ export const apiSlice = createApi({
         method: "POST",
         body: request,
       }),
-      invalidatesTags: ["Games"],
+      invalidatesTags: ["Games", "PlayerStats"],
     }),
     users: builder.query<User[], void>({
       query: () => "/users",
@@ -296,12 +315,17 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Users", "Players"],
     }),
+    playerStats: builder.query<PlayerStats[], void>({
+      query: () => "/stats/players",
+      providesTags: ["PlayerStats"],
+    }),
   }),
 })
 
 export const {
   useLoginMutation,
   usePlayersQuery,
+  usePlayerStatsQuery,
   useAddPlayerMutation,
   useDeletePlayerMutation,
   useCharactersQuery,
