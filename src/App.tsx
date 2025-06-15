@@ -15,6 +15,7 @@ import { setUserInfo } from "./features/auth/authSlice"
 import { jwtDecode } from "jwt-decode"
 import { useAppDispatch } from "./app/hooks"
 import ScriptManager from "./features/scripts/ScriptManager"
+import Dashboard from "./features/dashboard/Dashboard"
 
 const App = () => {
   const dispatch = useAppDispatch()
@@ -47,6 +48,7 @@ const App = () => {
       <Routes>
         <Route element={<PrivateOutlet />}>
           <Route element={<MainLayout />}>
+            <Route path="/manager/dashboard" element={<Dashboard />} />
             <Route path="/manager/games" element={<GameManager />} />
             <Route path="/manager/scripts" element={<ScriptManager />} />
             <Route path="/manager/characters" element={<CharacterManager />} />

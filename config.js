@@ -3,5 +3,5 @@
 
 window.__APP_CONFIG__ = {
   // The URL of the backend API.
-  apiBaseUrl: "http://blood-dev.klue.de/api/v1",
+  apiBaseUrl: "http://blood-dev.klue.de/backend/api/v1",
 }
