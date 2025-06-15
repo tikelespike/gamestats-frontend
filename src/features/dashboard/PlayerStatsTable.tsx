@@ -16,6 +16,7 @@ import {
   Title,
   Tooltip,
   UnstyledButton,
+  useMantineTheme,
 } from "@mantine/core"
 import {
   type PlayerStats,
@@ -24,6 +25,7 @@ import {
   useUsersQuery,
 } from "../api/apiSlice"
 import { useAppSelector } from "../../app/hooks"
+import { useMediaQuery } from "@mantine/hooks"
 
 type StatOption = {
   value: string
@@ -39,6 +41,8 @@ export default function PlayerStatsTable() {
   const [selectedStat, setSelectedStat] = useState<string>("wins")
   const currentUserId = useAppSelector(state => state.auth.userId)
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerStats | null>(null)
+  const theme = useMantineTheme()
+  const isSmallScreen = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
 
   if (
     statsLoading ||
@@ -80,7 +84,7 @@ export default function PlayerStatsTable() {
           : 0,
       format: (value, stats) => {
         if (stats.totalGamesPlayed - stats.timesStoryteller <= 0)
-          return "No games as player"
+          return isSmallScreen ? "-" : "No games as player"
 
         return (
           <Tooltip
@@ -89,8 +93,13 @@ export default function PlayerStatsTable() {
             withArrow
           >
             <Group gap="xs" align="center">
-              <Progress size="sm" w={100} value={value} color="green" />
-              <Text size="sm">{value.toFixed(1)}%</Text>
+              <Progress
+                size="sm"
+                w={isSmallScreen ? "40" : "100"}
+                value={value}
+                color="green"
+              />
+              {!isSmallScreen && <Text size="sm">{value.toFixed(1)}%</Text>}
             </Group>
           </Tooltip>
         )
@@ -284,6 +293,7 @@ export default function PlayerStatsTable() {
         onClose={() => setSelectedPlayer(null)}
         title="Player Statistics"
         size={"xs"}
+        fullScreen={isSmallScreen}
       >
         {selectedPlayer && (
           <Stack gap="md" m={"lg"}>
