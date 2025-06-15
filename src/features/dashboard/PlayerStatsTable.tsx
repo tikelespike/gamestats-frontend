@@ -158,6 +158,12 @@ export default function PlayerStatsTable() {
       getValue: stats => stats.characterTypeCounts["demon"] || 0,
       format: value => value.toString(),
     },
+    {
+      value: "storytellerCount",
+      label: "Top Storytellers",
+      getValue: stats => stats.timesStoryteller,
+      format: value => value.toString(),
+    },
   ]
 
   const selectedOption =
