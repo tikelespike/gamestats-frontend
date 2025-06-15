@@ -281,7 +281,11 @@ export default function PlayerStatsTable() {
                         fw={index === 0 ? 600 : 400}
                         style={{ cursor: "pointer" }}
                       >
-                        {playerMap.get(stats.playerId) || "Unknown Player"}
+                        {isSmallScreen
+                          ? (playerMap.get(stats.playerId) || "Unknown").split(
+                              " ",
+                            )[0]
+                          : playerMap.get(stats.playerId) || "Unknown Player"}
                         {index === 0 && " 🏆"}
                       </Text>
                     </UnstyledButton>
