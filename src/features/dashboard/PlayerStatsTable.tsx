@@ -129,8 +129,14 @@ export default function PlayerStatsTable() {
             withArrow
           >
             <Group gap="xs" align="center">
-              <Progress size="sm" w={100} value={value} color="blue" bg="red" />
-              <Text size="sm">{value.toFixed(1)}%</Text>
+              <Progress
+                size="sm"
+                w={isSmallScreen ? "40" : "100"}
+                value={value}
+                color="blue"
+                bg="red"
+              />
+              {!isSmallScreen && <Text size="sm">{value.toFixed(1)}%</Text>}
             </Group>
           </Tooltip>
         )
@@ -156,8 +162,13 @@ export default function PlayerStatsTable() {
             withArrow
           >
             <Group gap="xs" align="center">
-              <Progress size="sm" w={100} value={value} color="green" />
-              <Text size="sm">{value.toFixed(1)}%</Text>
+              <Progress
+                size="sm"
+                w={isSmallScreen ? "40" : "100"}
+                value={value}
+                color="green"
+              />
+              {!isSmallScreen && <Text size="sm">{value.toFixed(1)}%</Text>}
             </Group>
           </Tooltip>
         )
