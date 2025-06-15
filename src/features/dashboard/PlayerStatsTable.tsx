@@ -292,14 +292,14 @@ export default function PlayerStatsTable() {
             </Title>
             <Stack gap="md">
               {renderStatWithProgress(
-                "Wins",
+                "Won Games",
                 selectedPlayer.totalWins,
                 selectedPlayer.totalGamesPlayed -
                   selectedPlayer.timesStoryteller,
                 "green",
               )}
               {renderStatWithProgress(
-                "Survival",
+                "Survived Games",
                 selectedPlayer.totalGamesPlayed -
                   selectedPlayer.timesStoryteller -
                   selectedPlayer.timesDeadAtEnd,
@@ -308,7 +308,7 @@ export default function PlayerStatsTable() {
                 "green",
               )}
               {renderStatWithProgress(
-                "Good/Evil Ratio",
+                "Good Team Ratio",
                 selectedPlayer.timesGood,
                 selectedPlayer.timesGood + selectedPlayer.timesEvil,
                 "blue",
