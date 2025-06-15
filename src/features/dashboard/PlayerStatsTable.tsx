@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   Center,
-  Grid,
   Group,
   Loader,
   Modal,
@@ -74,15 +73,18 @@ export default function PlayerStatsTable() {
       value: "winRate",
       label: "Win Rate",
       getValue: stats =>
-        stats.totalGamesPlayed > 0
-          ? (stats.totalWins / stats.totalGamesPlayed) * 100
+        stats.totalGamesPlayed - stats.timesStoryteller > 0
+          ? (stats.totalWins /
+              (stats.totalGamesPlayed - stats.timesStoryteller)) *
+            100
           : 0,
       format: (value, stats) => {
-        if (stats.totalGamesPlayed === 0) return "No games"
+        if (stats.totalGamesPlayed - stats.timesStoryteller <= 0)
+          return "No games as player"
 
         return (
           <Tooltip
-            label={`Wins: ${stats.totalWins} | Total: ${stats.totalGamesPlayed}`}
+            label={`Wins: ${stats.totalWins} | Total: ${stats.totalGamesPlayed - stats.timesStoryteller}`}
             position="top"
             withArrow
           >
@@ -109,7 +111,7 @@ export default function PlayerStatsTable() {
       },
       format: (value, stats) => {
         const total = stats.timesGood + stats.timesEvil
-        if (total === 0) return "No games"
+        if (total === 0) return "No games as player"
 
         return (
           <Tooltip
@@ -199,10 +201,12 @@ export default function PlayerStatsTable() {
           w={100}
           value={(value / total) * 100}
           color={color}
-          bg={bg}
+          bg={total <= 0 ? undefined : bg}
         />
         <Text size="sm">
-          {value} / {total} ({((value / total) * 100).toFixed(1)}%)
+          {total <= 0
+            ? "No data"
+            : `${value} / ${total} (${((value / total) * 100).toFixed(1)}%)`}
         </Text>
       </Group>
     </Stack>
@@ -278,57 +282,43 @@ export default function PlayerStatsTable() {
       <Modal
         opened={selectedPlayer !== null}
         onClose={() => setSelectedPlayer(null)}
-        title={selectedPlayer ? playerMap.get(selectedPlayer.playerId) : ""}
-        size="lg"
+        title="Player Statistics"
+        size={"xs"}
       >
         {selectedPlayer && (
-          <Stack gap="md">
-            <Grid>
-              <Grid.Col span={6}>
-                <Card withBorder>
-                  <Text fw={500} mb="md">
-                    Game Statistics
-                  </Text>
-                  <Stack gap="md">
-                    {renderStatWithProgress(
-                      "Wins",
-                      selectedPlayer.totalWins,
-                      selectedPlayer.totalGamesPlayed,
-                      "green",
-                    )}
-                    {renderStatWithProgress(
-                      "Survival",
-                      selectedPlayer.totalGamesPlayed -
-                        selectedPlayer.timesStoryteller -
-                        selectedPlayer.timesDeadAtEnd,
-                      selectedPlayer.totalGamesPlayed -
-                        selectedPlayer.timesStoryteller,
-                      "green",
-                    )}
-                    <Text>
-                      {playerName} has run {selectedPlayer.timesStoryteller}{" "}
-                      game(s).
-                    </Text>
-                  </Stack>
-                </Card>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Card withBorder>
-                  <Text fw={500} mb="md">
-                    Alignment Statistics
-                  </Text>
-                  <Stack gap="md">
-                    {renderStatWithProgress(
-                      "Good/Evil Ratio",
-                      selectedPlayer.timesGood,
-                      selectedPlayer.timesGood + selectedPlayer.timesEvil,
-                      "blue",
-                      "red",
-                    )}
-                  </Stack>
-                </Card>
-              </Grid.Col>
-            </Grid>
+          <Stack gap="md" m={"lg"}>
+            <Title order={4}>
+              {selectedPlayer ? playerMap.get(selectedPlayer.playerId) : ""}
+            </Title>
+            <Stack gap="md">
+              {renderStatWithProgress(
+                "Wins",
+                selectedPlayer.totalWins,
+                selectedPlayer.totalGamesPlayed -
+                  selectedPlayer.timesStoryteller,
+                "green",
+              )}
+              {renderStatWithProgress(
+                "Survival",
+                selectedPlayer.totalGamesPlayed -
+                  selectedPlayer.timesStoryteller -
+                  selectedPlayer.timesDeadAtEnd,
+                selectedPlayer.totalGamesPlayed -
+                  selectedPlayer.timesStoryteller,
+                "green",
+              )}
+              {renderStatWithProgress(
+                "Good/Evil Ratio",
+                selectedPlayer.timesGood,
+                selectedPlayer.timesGood + selectedPlayer.timesEvil,
+                "blue",
+                "red",
+              )}
+              <Text>
+                {playerName} has run {selectedPlayer.timesStoryteller} game
+                {selectedPlayer.timesStoryteller === 1 ? "" : "s"}.
+              </Text>
+            </Stack>
           </Stack>
         )}
         <Group justify="flex-end" mt="xl">
