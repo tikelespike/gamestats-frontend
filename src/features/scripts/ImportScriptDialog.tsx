@@ -41,18 +41,18 @@ const ImportScriptDialog = ({
     const characterIds: number[] = []
     const unknownCharacters: string[] = []
 
-    // Check if first element is a meta object
-    if (typeof parsed[0] === "object" && parsed[0] !== null) {
-      const meta = parsed[0] as ScriptToolExport
-      if (meta.id === "_meta") {
-        name = meta.name || ""
-        description = meta.author ? `Created by ${meta.author}` : null
-        scriptToolIdentifiers.push(...(parsed.slice(1) as string[]))
-      } else {
-        scriptToolIdentifiers.push(...(parsed as string[]))
+    for (const item of parsed) {
+      if (typeof item === "string") {
+        scriptToolIdentifiers.push(item)
+      } else if (
+        typeof item === "object" &&
+        item !== null &&
+        "id" in item &&
+        item.id === "_meta"
+      ) {
+        name = item.name || ""
+        description = item.author ? `Created by ${item.author}` : null
       }
-    } else {
-      scriptToolIdentifiers.push(...(parsed as string[]))
     }
 
     for (const identifier of scriptToolIdentifiers) {
