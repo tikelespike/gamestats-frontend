@@ -249,6 +249,18 @@ export const apiSlice = createApi({
     officialCharacters: builder.query<AddCharacterRequest[], void>({
       query: () => "/officialtool/characters",
     }),
+    updateSuggestions: builder.query<Character[], void>({
+      query: () => "/officialtool/characters/update-suggestions",
+      providesTags: ["Characters"],
+    }),
+    batchUpdateCharacters: builder.mutation<Character[], Character[]>({
+      query: requests => ({
+        url: "/characters/batch",
+        method: "PUT",
+        body: requests,
+      }),
+      invalidatesTags: ["Characters"],
+    }),
     scripts: builder.query<Script[], void>({
       query: () => "/scripts",
       providesTags: ["Scripts"],
@@ -335,6 +347,8 @@ export const {
   useDeleteCharacterMutation,
   useBatchDeleteCharactersMutation,
   useOfficialCharactersQuery,
+  useUpdateSuggestionsQuery,
+  useBatchUpdateCharactersMutation,
   useScriptsQuery,
   useAddScriptMutation,
   useEditScriptMutation,

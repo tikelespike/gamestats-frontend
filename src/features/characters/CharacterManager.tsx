@@ -1,18 +1,9 @@
 import React from "react"
 import CharacterCard from "./CharacterCard"
 import type { MantineTheme } from "@mantine/core"
-import {
-  Box,
-  Button,
-  Center,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  useMantineTheme,
-} from "@mantine/core"
+import { Box, Button, Center, Group, Loader, Stack, Text, useMantineTheme } from "@mantine/core"
 import type { AddCharacterRequest } from "../api/apiSlice"
-import { useCharactersQuery, useOfficialCharactersQuery } from "../api/apiSlice"
+import { useCharactersQuery, useOfficialCharactersQuery, useUpdateSuggestionsQuery } from "../api/apiSlice"
 import ErrorDisplay from "../../components/ErrorDisplay"
 import { useMediaQuery } from "@mantine/hooks"
 import { modals } from "@mantine/modals"
@@ -20,6 +11,7 @@ import styles from "./CharacterManager.module.css"
 import AddCharacterCard from "./AddCharacterCard"
 import { BatchDeleteDialog } from "./BatchDeleteDialog"
 import { BatchAddDialog } from "./BatchAddDialog"
+import { BatchUpdateDialog } from "./BatchUpdateDialog"
 import { AddCharacterModal } from "./AddCharacterModal"
 import { EditCharacterModal } from "./EditCharacterModal"
 
@@ -32,6 +24,7 @@ const CharacterManager = () => {
   >([])
   const getCharactersState = useCharactersQuery()
   const getOfficialCharactersState = useOfficialCharactersQuery()
+  const getUpdateSuggestionsState = useUpdateSuggestionsQuery()
   const isSmallScreen = useMediaQuery(`(max-width: ${theme.breakpoints.xs})`)
 
   const handleOpenAddModal = () => {
@@ -119,9 +112,11 @@ const CharacterManager = () => {
 
   let missingOfficialCharacters: AddCharacterRequest[] = []
   if (getCharactersState.data && getOfficialCharactersState.data) {
-    const existingNames = new Set(getCharactersState.data.map(c => c.name))
+    const existingScriptIds = new Set(
+      getCharactersState.data.map(c => c.scriptToolIdentifier),
+    )
     missingOfficialCharacters = getOfficialCharactersState.data.filter(
-      character => !existingNames.has(character.name),
+      character => !existingScriptIds.has(character.scriptToolIdentifier),
     )
   }
 
@@ -137,6 +132,27 @@ const CharacterManager = () => {
             modals.close(modalId)
           }}
           characters={missingCharacters}
+        />
+      ),
+    })
+  }
+
+  const handleBatchUpdateCharacters = () => {
+    if (
+      getUpdateSuggestionsState.data === undefined ||
+      getUpdateSuggestionsState.data.length === 0
+    ) {
+      return
+    }
+
+    const modalId = modals.open({
+      title: "Update Characters",
+      children: (
+        <BatchUpdateDialog
+          onClose={() => {
+            modals.close(modalId)
+          }}
+          characters={getUpdateSuggestionsState.data!}
         />
       ),
     })
@@ -221,15 +237,34 @@ const CharacterManager = () => {
               </Button>
             </>
           ) : (
-            <Button
-              variant="gradient"
-              onClick={handleBatchAddCharacters}
-              disabled={missingOfficialCharacters.length === 0}
-            >
-              {missingOfficialCharacters.length > 0
-                ? `Import ${missingOfficialCharacters.length} new character${missingOfficialCharacters.length > 1 ? "s" : ""}`
-                : "No new characters"}
-            </Button>
+            <Group>
+              <Button
+                variant="gradient"
+                onClick={handleBatchAddCharacters}
+                disabled={missingOfficialCharacters.length === 0}
+              >
+                {missingOfficialCharacters.length > 0
+                  ? `Import ${missingOfficialCharacters.length} new character${missingOfficialCharacters.length > 1 ? "s" : ""}`
+                  : "No new characters"}
+              </Button>
+              <Button
+                variant="light"
+                color="blue"
+                onClick={handleBatchUpdateCharacters}
+                disabled={
+                  getUpdateSuggestionsState.isLoading ||
+                  getUpdateSuggestionsState.data === undefined ||
+                  getUpdateSuggestionsState.data.length === 0
+                }
+              >
+                {getUpdateSuggestionsState.isLoading
+                  ? "Loading..."
+                  : getUpdateSuggestionsState.data &&
+                      getUpdateSuggestionsState.data.length > 0
+                    ? `Update ${getUpdateSuggestionsState.data.length} character${getUpdateSuggestionsState.data.length > 1 ? "s" : ""}`
+                    : "No updates available"}
+              </Button>
+            </Group>
           )}
         </Group>
       </Group>
